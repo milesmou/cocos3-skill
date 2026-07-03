@@ -28,6 +28,10 @@
 
 从 Prefab 安全删除节点及其完整子树，通过可达性分析清理所属组件和关联对象，并重映射全部 `__id__`。禁止删除根节点，且会保护仍被外部属性引用的节点或组件。
 
+### rename-cocos-prefab-node
+
+按节点路径修改根节点或子节点名称，提供同级重名保护和 dry-run。修改根节点时同步 Prefab 资源名及 `.meta` 中的 `syncNodeName`。
+
 ## 目录结构
 
 ```text
@@ -38,6 +42,7 @@ cocos-skill/
 ├── set-cocos-component-properties/
 ├── remove-cocos-node-component/
 ├── remove-cocos-prefab-node/
+├── rename-cocos-prefab-node/
 └── README.md
 ```
 

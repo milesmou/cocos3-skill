@@ -1,0 +1,4 @@
+interface:
+  display_name: "修改 Cocos 节点名称"
+  short_description: "安全修改 Prefab 根节点或子节点名称"
+  default_prompt: "使用 $rename-cocos-prefab-node 修改 Cocos Creator 3.8 Prefab 中的节点名称。"
