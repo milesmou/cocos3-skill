@@ -1,0 +1,4 @@
+interface:
+  display_name: "删除 Cocos Prefab 节点"
+  short_description: "安全删除节点子树并重映射 Prefab 对象引用"
+  default_prompt: "使用 $remove-cocos-prefab-node 从 Cocos Creator 3.8 Prefab 删除节点及其子树。"

@@ -20,6 +20,14 @@
 
 设置内置或自定义组件的序列化属性，支持基础值、值类型、数组、节点引用、组件引用以及 SpriteFrame、Texture2D、TextAsset、JsonAsset、AudioClip、Prefab、Material 等资源引用。
 
+### remove-cocos-node-component
+
+从节点安全移除内置或自定义组件，删除配套 `CompPrefabInfo`，并在压缩对象表后重映射全部 `__id__`。默认保护 `UITransform`，且会拒绝删除仍被其他对象引用的组件。
+
+### remove-cocos-prefab-node
+
+从 Prefab 安全删除节点及其完整子树，通过可达性分析清理所属组件和关联对象，并重映射全部 `__id__`。禁止删除根节点，且会保护仍被外部属性引用的节点或组件。
+
 ## 目录结构
 
 ```text
@@ -28,6 +36,8 @@ cocos-skill/
 ├── add-cocos-prefab-node/
 ├── add-cocos-node-component/
 ├── set-cocos-component-properties/
+├── remove-cocos-node-component/
+├── remove-cocos-prefab-node/
 └── README.md
 ```
 
