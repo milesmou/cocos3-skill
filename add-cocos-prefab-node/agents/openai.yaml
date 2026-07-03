@@ -1,0 +1,4 @@
+interface:
+  display_name: "添加 Cocos Prefab 子节点"
+  short_description: "为 Cocos Creator 3.8 预制体添加空子节点"
+  default_prompt: "使用 $add-cocos-prefab-node 为指定的 Cocos Creator 3.8 Prefab 添加空子节点。"

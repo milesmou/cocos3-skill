@@ -1,0 +1,4 @@
+interface:
+  display_name: "创建 Cocos Prefab"
+  short_description: "为 Cocos Creator 3.8 工程创建空预制体"
+  default_prompt: "使用 $create-cocos-prefab 在指定的 Cocos Creator 3.8 工程中创建空 Prefab。"
