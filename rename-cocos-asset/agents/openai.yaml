@@ -1,0 +1,4 @@
+interface:
+  display_name: "重命名 Cocos 资源"
+  short_description: "同步重命名资源和 meta 并保持 UUID"
+  default_prompt: "使用 $rename-cocos-asset 重命名 Cocos Creator 资源及其 meta 文件。"

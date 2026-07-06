@@ -32,6 +32,18 @@
 
 按节点路径修改根节点或子节点名称，提供同级重名保护和 dry-run。修改根节点时同步 Prefab 资源名及 `.meta` 中的 `syncNodeName`。
 
+### import-cocos-assets
+
+将外部文件或目录批量导入 Creator 3.8 工程，生成主 UUID、图片子资源 UUID 和 Spine atlas 关联。支持 PNG、脚本、JSON、文本、音频、Effect、Material 与 Spine 资源组。
+
+### move-cocos-asset
+
+在 `assets` 内移动文件或目录资源，并同步移动配套 `.meta`。资源名称和 meta 内容保持不变，从而保留 UUID。
+
+### rename-cocos-asset
+
+在原目录同步重命名资源和 `.meta`，保持文件扩展名、meta 内容及 UUID 不变，并支持仅修改名称大小写。
+
 ## 目录结构
 
 ```text
@@ -43,6 +55,9 @@ cocos-skill/
 ├── remove-cocos-node-component/
 ├── remove-cocos-prefab-node/
 ├── rename-cocos-prefab-node/
+├── import-cocos-assets/
+├── move-cocos-asset/
+├── rename-cocos-asset/
 └── README.md
 ```
 
