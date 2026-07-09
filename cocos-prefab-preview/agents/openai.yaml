@@ -1,0 +1,4 @@
+interface:
+  display_name: "Cocos Prefab Preview"
+  short_description: "Preview Cocos prefab UI as static HTML"
+  default_prompt: "Use $cocos-prefab-preview to preview this Cocos Creator prefab."
