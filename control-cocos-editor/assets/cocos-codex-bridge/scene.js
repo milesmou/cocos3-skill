@@ -489,7 +489,8 @@ exports.methods = {
       'queryAnimationClipDump',
       'queryAnimationNodeEditInfo',
       'queryAnimClipsInfo',
-      'queryPlayState'
+      'queryPlayState',
+      'setEditClip'
     ]);
     if (!methods.has(action) || typeof cce.Animation[action] !== 'function') {
       throw new Error(`unsupported animation query: ${action}`);

@@ -60,7 +60,7 @@ Use `db://assets/...` URLs for destinations and queries whenever possible.
 - `validateScene()`
 - `validateUI(selector?, options?)`
 - `prefabAction(action, nodeSelector, options?)`, where action is `apply`, `restore`, `unlink`, `create`, or `link`
-- `animationQuery(action, ...args)`
+- `animationQuery(action, ...args)`, including `setEditClip(clipUuid)` before animation operations
 - `animationOperation(operations, options?)`
 - `saveAnimation()`
 

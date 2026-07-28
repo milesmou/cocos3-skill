@@ -17,14 +17,20 @@ node ../control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> r
 ## 修改
 
 1. 从 Creator 返回的 clip dump 和编辑信息中确定属性路径、时间和数据类型。
-2. 生成 Creator 3.8 动画管理器接受的 operation 数组；不要猜测函数名或参数。
-3. 一次提交同一意图的操作：
+2. 将目标 clip 设为当前编辑 clip：
+
+   ```powershell
+   node ../control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> request scene-script animationQuery '["setEditClip","<Clip UUID>"]'
+   ```
+
+3. 生成 Creator 3.8 动画管理器接受的 operation 数组；不要猜测函数名或参数。
+4. 一次提交同一意图的操作：
 
    ```powershell
    node ../control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> request scene-script animationOperation '[[{"funcName":"<从当前编辑器操作模型确认的方法>","args":[]}],{}]'
    ```
 
-4. 查询 clip dump 对比结果。
-5. 调用 `scene-script saveAnimation`，然后保存场景或 Prefab。
+5. 查询 clip dump 对比结果。
+6. 调用 `scene-script saveAnimation`，然后保存场景或 Prefab。
 
 当无法从当前 Creator 返回数据确认 operation schema 时停止，不直接改写 `.anim` 或动画曲线序列化 JSON。

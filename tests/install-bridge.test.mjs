@@ -18,8 +18,11 @@ test('bridge installer installs and removes the extension in a Creator 3.8 proje
     const installedPackage = join(project, 'extensions', 'cocos-codex-bridge', 'package.json');
     const manifest = JSON.parse(await readFile(installedPackage, 'utf8'));
     assert.equal(manifest.name, 'cocos-codex-bridge');
-    assert.equal(manifest.version, '1.2.0');
+    assert.equal(manifest.version, '1.2.1');
     assert.equal(manifest.panels.preview.main, './preview.js');
+    const installedScene = join(project, 'extensions', 'cocos-codex-bridge', 'scene.js');
+    const sceneSource = await readFile(installedScene, 'utf8');
+    assert.match(sceneSource, /'setEditClip'/);
     const installedPreview = join(project, 'extensions', 'cocos-codex-bridge', 'preview.js');
     const previewSource = await readFile(installedPreview, 'utf8');
     assert.match(previewSource, /callPreview\('is2DView'\)/);
