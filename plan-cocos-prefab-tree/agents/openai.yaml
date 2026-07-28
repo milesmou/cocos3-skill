@@ -1,0 +1,4 @@
+interface:
+  display_name: "Cocos Prefab 节点树规划"
+  short_description: "智能分析提示与效果图，规划可拼装的 Cocos Prefab 节点树"
+  default_prompt: "使用 $plan-cocos-prefab-tree 分析我的界面需求并生成可直接拼装的 Prefab 节点蓝图。"
