@@ -13,6 +13,7 @@ description: 通过 Cocos Creator 3.8 编辑器拼装、重构和验收 UI 场�
 2. 确认目标 Canvas、设计分辨率策略、目标 Prefab URL、所需资源 UUID 和可复用 Prefab。
 3. 先创建容器层级，再实例化可复用控件；节点创建后立即记录返回的 UUID，不依赖易歧义路径。
 4. 按顺序配置：
+   - 未特意指定 Layer 时，将新建 Prefab 的根节点及全部后代节点统一设置为 `UI_2D`（`33554432`）。
    - 添加 `UITransform`，设置尺寸和锚点。
    - 添加 Sprite、Label、Mask 等视觉组件并绑定资源。未指定美术资源时，Sprite 使用引擎内置的 `default_sprite_splash` SpriteFrame，并调整 `UITransform` 尺寸和 Sprite 颜色以适配界面。
    - 设置子节点尺寸，再配置父容器 `Layout`。

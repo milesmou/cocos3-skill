@@ -16,7 +16,7 @@ description: 使用 Node.js 向现有 Cocos Creator 3.8 Prefab 添加空 UI 子�
    node scripts/add-node.mjs --project <工程目录> --prefab <资源相对路径> --name <节点名称> [--position <x,y>] [--size <宽度,高度>] [--anchor <x,y>]
    ```
 
-3. 省略 `--parent` 时添加到根节点下。若要指定后代节点，传入以斜杠分隔的名称路径，例如 `--parent Panel/Content`；路径开头的根节点名称可以省略。位置默认为 `0,0`，尺寸默认为 `100,100`，锚点默认为 `0.5,0.5`。
+3. 省略 `--parent` 时添加到根节点下。若要指定后代节点，传入以斜杠分隔的名称路径，例如 `--parent Panel/Content`；路径开头的根节点名称可以省略。位置默认为 `0,0`，尺寸默认为 `100,100`，锚点默认为 `0.5,0.5`。未特意指定 Layer 时，新节点使用 `UI_2D`（`33554432`）。
 4. 只有用户明确需要同级重名节点时才使用 `--allow-duplicate`。
 5. 验证父节点 `_children` 中存在新节点引用、新节点包含 `cc.UITransform`，并具有有效的 Prefab 关联记录。
 
