@@ -14,7 +14,7 @@ description: 通过 Cocos Creator 3.8 编辑器拼装、重构和验收 UI 场�
 3. 先创建容器层级，再实例化可复用控件；节点创建后立即记录返回的 UUID，不依赖易歧义路径。
 4. 按顺序配置：
    - 添加 `UITransform`，设置尺寸和锚点。
-   - 添加 Sprite、Label、Mask 等视觉组件并绑定资源。
+   - 添加 Sprite、Label、Mask 等视觉组件并绑定资源。未指定美术资源时，Sprite 使用引擎内置的 `default_sprite_splash` SpriteFrame，并调整 `UITransform` 尺寸和 Sprite 颜色以适配界面。
    - 设置子节点尺寸，再配置父容器 `Layout`。
    - 最后配置 `Widget`、Button/Toggle/ScrollView 和 EventHandler。
 5. 对 Layout 调用 `updateLayout`，对 Widget 调用 `updateAlignment`；从内层到外层更新。
