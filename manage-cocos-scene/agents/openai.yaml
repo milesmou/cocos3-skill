@@ -1,0 +1,4 @@
+interface:
+  display_name: "管理 Cocos 场景"
+  short_description: "创建、打开、查询、保存和配置 Creator 场景"
+  default_prompt: "Use $manage-cocos-scene to manage a Cocos Creator 3.8 scene."

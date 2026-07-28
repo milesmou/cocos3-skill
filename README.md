@@ -1,8 +1,60 @@
-# Cocos Creator 3.8 Prefab Skill 工程
+# Cocos Creator 3.8 编辑器控制 Skill 工程
 
-本项目提供一组基于 Node.js 的 Codex Skill，用于直接创建和修改 Cocos Creator 3.8 的 Prefab 序列化文件。脚本会维护节点、组件、PrefabInfo、CompPrefabInfo、UUID 和对象引用，减少手工编辑 `.prefab` JSON 时产生引用错误的风险。
+本项目提供一组 Codex Skill，用于查询和操控 Cocos Creator 3.8 的场景、Prefab、节点、组件和资源。
+
+首选工作流通过 `cocos-codex-bridge` 扩展调用 Creator 官方 Scene、AssetDB 消息和 Scene Script API。原有直接修改 Prefab 序列化文件的脚本保留为编辑器无法启动时的离线后备。
 
 ## 当前技能
+
+### control-cocos-editor
+
+安装本机认证的 Creator 3.8 桥接扩展，并通过统一 CLI 调用 Scene、AssetDB 和 Scene Script。
+
+### inspect-cocos-content
+
+只读查询当前场景或 Prefab 的节点树、组件、属性、Prefab 状态以及资源依赖关系。
+
+### manage-cocos-scene
+
+查询、打开、保存、关闭和配置场景。
+
+### manage-cocos-node
+
+创建、复制、变换、移动、重排和删除当前编辑上下文中的 2D/3D 节点。
+
+### manage-cocos-prefab-instance
+
+实例化 Prefab，并管理实例恢复、应用和解除关联。
+
+### manage-cocos-components
+
+通过注册类名和组件 UUID 管理任意内置或自定义组件。
+
+### manage-cocos-assets
+
+通过 AssetDB 查询、创建、导入、复制、移动、重命名、删除和重新导入资源。
+
+### validate-cocos-content
+
+在线验证当前场景，并离线检查所有场景、Prefab、`.meta`、UUID 和对象引用。
+
+### create-cocos-component-script
+
+通过 AssetDB 创建 TypeScript 组件脚本，等待导入并确认组件注册。
+
+### manage-cocos-event-handlers
+
+配置 Button、Toggle、ScrollView 等组件的 Inspector 事件回调。
+
+### manage-cocos-animation
+
+查询 AnimationClip dump，并通过 Creator 动画管理器提交和保存动画操作。
+
+### assemble-cocos-ui
+
+按 Creator 3.8 的 UI 约束拼装场景或 Prefab，组织 Canvas、UITransform、Widget、Layout、Mask、ScrollView、事件和嵌套 Prefab，并执行专用 UI 校验。
+
+## 离线 Prefab 技能
 
 ### create-cocos-prefab
 
@@ -44,10 +96,39 @@
 
 在原目录同步重命名资源和 `.meta`，保持文件扩展名、meta 内容及 UUID 不变，并支持仅修改名称大小写。
 
+## 架构
+
+```text
+Codex Skill
+    │
+    ├─ control-cocos-editor/scripts/cocos-editor.mjs
+    │       │  localhost + 临时令牌
+    │       ▼
+    ├─ Creator 扩展 cocos-codex-bridge
+    │       ├─ Editor.Message → scene / asset-db
+    │       └─ execute-scene-script → cc / cce API
+    │
+    └─ 离线后备脚本 → .prefab / .meta
+```
+
+在线模式可以使用 Creator 的实际类型注册、资源数据库、Prefab 管理和撤销系统。离线模式不应在 Creator 正在编辑同一资源时使用。
+
 ## 目录结构
 
 ```text
 cocos-skill/
+├── control-cocos-editor/
+├── inspect-cocos-content/
+├── manage-cocos-scene/
+├── manage-cocos-node/
+├── manage-cocos-prefab-instance/
+├── manage-cocos-components/
+├── manage-cocos-assets/
+├── validate-cocos-content/
+├── create-cocos-component-script/
+├── manage-cocos-event-handlers/
+├── manage-cocos-animation/
+├── assemble-cocos-ui/
 ├── create-cocos-prefab/
 ├── add-cocos-prefab-node/
 ├── add-cocos-node-component/
@@ -58,6 +139,7 @@ cocos-skill/
 ├── import-cocos-assets/
 ├── move-cocos-asset/
 ├── rename-cocos-asset/
+├── tests/
 └── README.md
 ```
 
@@ -73,7 +155,14 @@ cocos-skill/
 - Node.js 18 或更高版本
 - 目标工程必须包含有效的 `package.json` 和 `assets` 目录
 
-脚本会检查 `package.json` 中的 Creator 版本，并限制资源路径位于目标工程的 `assets` 目录内。
+在线控制需要在目标工程安装并启用桥接扩展：
+
+```powershell
+node control-cocos-editor/scripts/install-bridge.mjs --project <工程目录>
+node control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> status
+```
+
+脚本会检查 `package.json` 中的 Creator 版本。桥接服务只监听 `127.0.0.1`，连接信息和一次性令牌保存在目标工程的 `temp` 目录。
 
 ## 基本示例
 
@@ -110,8 +199,18 @@ node set-cocos-component-properties/scripts/set-properties.mjs `
 
 ## 安全约束
 
+- 在线修改优先使用 Creator 官方消息。
+- 桥接只允许预定义的 Scene 和 AssetDB 消息。
+- 修改前查询 UUID 和当前状态，修改后保存并验证。
 - 默认拒绝覆盖已有 Prefab。
 - 默认拒绝同级重名节点和重复组件。
 - 禁止资源路径越过目标工程的 `assets` 目录。
 - 设置属性时禁止修改关键序列化关联字段。
 - 推荐对复杂属性修改先使用 `--dry-run`。
+
+## 验证
+
+```powershell
+node --test tests/*.test.mjs
+node validate-cocos-content/scripts/validate-project.mjs --project <工程目录>
+```

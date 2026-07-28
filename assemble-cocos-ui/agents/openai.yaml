@@ -1,0 +1,4 @@
+interface:
+  display_name: "Cocos UI 拼装"
+  short_description: "在 Creator 3.8 中拼装并验证 UI 场景和 Prefab"
+  default_prompt: "使用 $assemble-cocos-ui 在 Cocos Creator 3.8 编辑器中拼装、绑定并验证 UI 场景或 Prefab。"

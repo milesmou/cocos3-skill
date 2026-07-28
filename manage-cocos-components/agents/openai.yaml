@@ -1,0 +1,4 @@
+interface:
+  display_name: "管理 Cocos 组件"
+  short_description: "查询、添加、设置、重置和删除任意 Creator 组件"
+  default_prompt: "Use $manage-cocos-components to manage node components in Cocos Creator."

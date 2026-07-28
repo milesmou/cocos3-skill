@@ -1,0 +1,4 @@
+interface:
+  display_name: "验证 Cocos 内容"
+  short_description: "检查场景、Prefab、组件与资源引用的完整性"
+  default_prompt: "Use $validate-cocos-content to validate Cocos scenes, prefabs, components, and assets."

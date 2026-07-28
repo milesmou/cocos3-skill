@@ -1,0 +1,4 @@
+interface:
+  display_name: "管理 Cocos 节点"
+  short_description: "创建、变换、复制、重排和删除 Creator 场景节点"
+  default_prompt: "Use $manage-cocos-node to manage nodes in the active Cocos scene or prefab."

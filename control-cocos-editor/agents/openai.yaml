@@ -1,0 +1,4 @@
+interface:
+  display_name: "Cocos 编辑器控制桥"
+  short_description: "通过 Creator 3.8 官方消息接口执行安全编辑操作"
+  default_prompt: "Use $control-cocos-editor to connect to and control a Cocos Creator 3.8 editor."

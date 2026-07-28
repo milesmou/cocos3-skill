@@ -1,6 +1,6 @@
 ---
 name: cocos-prefab-preview
-description: Generate and inspect a static HTML preview for Cocos Creator 3.x `.prefab` UI files by reading prefab JSON, nested prefab instances, SpriteFrame metadata, png assets, UITransform, Sprite, Label, Mask, Spine placeholders, and common sliced-sprite settings. Use when Codex is asked to preview, screenshot, compare, or visually inspect a Cocos prefab without launching Cocos Creator, especially for UI prefabs under `assets/**`.
+description: Preview and inspect Cocos Creator 3.8 `.prefab` UI content, preferring the Creator 3.8.5+ built-in Prefab Inspector preview when the editor bridge is available and falling back to a static HTML renderer for headless use. Supports screenshots, comparisons, nested prefabs, Sprite, Label, Mask, Spine placeholders, and sliced sprites.
 ---
 
 # Cocos Prefab Preview
@@ -8,7 +8,8 @@ description: Generate and inspect a static HTML preview for Cocos Creator 3.x `.
 ## Workflow
 
 1. Locate the Cocos Creator project root. Prefer the directory containing `assets/`, `library/`, `package.json`, and `settings/`.
-2. Run the bundled renderer:
+2. When Creator 3.8.5 or newer and `control-cocos-editor` are available, query the Prefab with AssetDB and call `open-asset` using its UUID. Prefer the built-in Inspector preview for authoritative rendering and import diagnostics.
+3. When Creator is unavailable or an HTML artifact is required, run the bundled renderer:
 
 ```bash
 node cocos-prefab-preview/scripts/cocos-prefab-preview.mjs <projectRoot> <prefabPath> <outHtml> [scale]
@@ -22,14 +23,14 @@ node cocos-prefab-preview/scripts/cocos-prefab-preview.mjs . assets/bundles/dyna
 
 Use `scale` below `1`, such as `0.55`, when the full prefab is taller than the browser viewport and a complete non-stitched screenshot is needed.
 
-3. Open the generated HTML through the bundled Node static server when browser verification is needed. Browser policies may block `file:///` pages from loading local images.
+4. Open the generated HTML through the bundled Node static server when browser verification is needed. Browser policies may block `file:///` pages from loading local images.
 
 ```bash
 node cocos-prefab-preview/scripts/serve-preview.mjs <previewDir> 4177
 ```
 
-4. Verify the page visually and, when possible, capture a screenshot. Check that image counts load, sliced backgrounds render, labels are visible, Spine placeholders mark any `sp.Skeleton` nodes, and the static bounds look plausible.
-5. Stop the Node static server after verification, then delete copied temporary preview resources:
+5. Verify the page visually and, when possible, capture a screenshot. Check that image counts load, sliced backgrounds render, labels are visible, Spine placeholders mark any `sp.Skeleton` nodes, and the static bounds look plausible.
+6. Stop the Node static server after verification, then delete copied temporary preview resources:
 
 ```bash
 node cocos-prefab-preview/scripts/cocos-prefab-preview.mjs --cleanup <outHtml>

@@ -1,0 +1,4 @@
+interface:
+  display_name: "检查 Cocos 内容"
+  short_description: "只读查询场景节点、组件属性、资源依赖和引用关系"
+  default_prompt: "Use $inspect-cocos-content to inspect this Cocos Creator project."

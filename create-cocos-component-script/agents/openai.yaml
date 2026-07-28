@@ -1,0 +1,4 @@
+interface:
+  display_name: "创建 Cocos 组件脚本"
+  short_description: "创建、导入并注册 Creator TypeScript 组件资源"
+  default_prompt: "Use $create-cocos-component-script to create a Cocos Creator 3.8 component script."

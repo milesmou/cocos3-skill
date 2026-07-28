@@ -1,0 +1,4 @@
+interface:
+  display_name: "管理 Cocos 资源"
+  short_description: "通过 AssetDB 查询、创建、导入、移动和删除资源"
+  default_prompt: "Use $manage-cocos-assets to manage assets through the Cocos Creator AssetDB."

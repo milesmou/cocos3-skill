@@ -1,0 +1,4 @@
+interface:
+  display_name: "管理 Cocos 动画"
+  short_description: "查询和编辑 Creator AnimationClip 与关键帧操作"
+  default_prompt: "Use $manage-cocos-animation to inspect or edit Cocos Creator animations."

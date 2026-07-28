@@ -9,7 +9,7 @@ if (args[0] === '--cleanup') {
 
 const [projectRootArg, prefabArg, outArg, scaleArg] = args;
 if (!projectRootArg || !prefabArg || !outArg) {
-  throw new Error('Usage: node tools/cocos-prefab-preview.mjs <projectRoot> <prefab> <outHtml> [scale]\n       node tools/cocos-prefab-preview.mjs --cleanup <outHtml>');
+  throw new Error('Usage: node scripts/cocos-prefab-preview.mjs <projectRoot> <prefab> <outHtml> [scale]\n       node scripts/cocos-prefab-preview.mjs --cleanup <outHtml>');
 }
 
 const projectRoot = path.resolve(projectRootArg);
@@ -24,7 +24,7 @@ function manifestPathFor(htmlPath) {
 }
 
 function cleanupCopiedAssets(htmlPath) {
-  if (!htmlPath) throw new Error('Usage: node tools/cocos-prefab-preview.mjs --cleanup <outHtml>');
+  if (!htmlPath) throw new Error('Usage: node scripts/cocos-prefab-preview.mjs --cleanup <outHtml>');
   const manifestPath = manifestPathFor(htmlPath);
   if (!fs.existsSync(manifestPath)) {
     console.log(`No copied asset manifest found: ${manifestPath}`);

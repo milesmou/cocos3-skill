@@ -1,0 +1,4 @@
+interface:
+  display_name: "管理 Cocos Prefab 实例"
+  short_description: "实例化、还原、应用和解除 Creator Prefab 关联"
+  default_prompt: "Use $manage-cocos-prefab-instance to manage prefab instances in Cocos Creator."
