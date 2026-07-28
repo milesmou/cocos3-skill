@@ -43,6 +43,16 @@ node scripts/cocos-editor.mjs --project <工程目录> request scene-script insp
 
 完整方法和参数见 [references/api.md](references/api.md)。
 
+## 导出 Prefab PNG
+
+Creator 3.8.5-3.8.x 可调用 Inspector 使用的内部 WebGL 预览器：
+
+```powershell
+node scripts/cocos-editor.mjs --project <工程目录> --timeout 60000 --width 1024 --height 768 preview db://assets/ui/example.prefab temp/previews/example.png
+```
+
+该接口属于 Creator 内部实现。桥接会检查版本、强制确认 2D 预览模式并限制输出位于目标工程内；编辑器不可用或内部接口失败时停止并报告。
+
 ## 安全规则
 
 - 修改前先查询目标 UUID、当前属性和 Prefab 状态。

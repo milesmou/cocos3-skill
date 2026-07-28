@@ -1,4 +1,4 @@
 interface:
   display_name: "Cocos Prefab Preview"
-  short_description: "Preview Cocos prefab UI as static HTML"
-  default_prompt: "Use $cocos-prefab-preview to preview this Cocos Creator prefab."
+  short_description: "用 Creator 内部 WebGL 渲染器导出 Prefab PNG"
+  default_prompt: "Use $cocos-prefab-preview to render this Prefab through Cocos Creator and export a PNG."

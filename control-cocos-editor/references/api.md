@@ -2,6 +2,14 @@
 
 Use `node control-cocos-editor/scripts/cocos-editor.mjs --project <project> request <target> <method> '<args-array>'`.
 
+Export a Prefab through Creator 3.8.5-3.8.x's internal WebGL renderer:
+
+```powershell
+node control-cocos-editor/scripts/cocos-editor.mjs --project <project> --timeout 60000 --width 1024 --height 768 preview db://assets/ui/example.prefab temp/previews/example.png
+```
+
+The output must be a `.png` inside the target project. This opens a temporary simple panel, calls the internal `scene:prefab-preview` renderer, switches and verifies `is2DView`, captures its WebGL canvas, and closes the panel if the bridge opened it. A successful result includes `"previewMode": "2D"`.
+
 ## Targets
 
 - `scene`: forwards an allowlisted public Creator 3.8 Scene message.

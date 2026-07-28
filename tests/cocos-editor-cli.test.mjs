@@ -82,3 +82,46 @@ test('editor CLI waits until AssetDB becomes idle', async () => {
     await rm(project, { recursive: true, force: true });
   }
 });
+
+test('editor CLI requests internal Prefab PNG export', async () => {
+  const project = await mkdtemp(join(tmpdir(), 'cocos-cli-preview-test-'));
+  let received;
+  const server = createServer(async (request, response) => {
+    const chunks = [];
+    for await (const chunk of request) chunks.push(chunk);
+    received = JSON.parse(Buffer.concat(chunks).toString('utf8'));
+    response.writeHead(200, { 'content-type': 'application/json' });
+    response.end(JSON.stringify({
+      ok: true,
+      result: { renderer: 'scene:prefab-preview', output: 'D:/project/temp/example.png' }
+    }));
+  });
+  try {
+    await new Promise((resolveListen) => server.listen(0, '127.0.0.1', resolveListen));
+    const address = server.address();
+    await mkdir(join(project, 'temp'));
+    await writeFile(join(project, 'temp', 'cocos-codex-bridge.json'), JSON.stringify({
+      schema: 1,
+      host: '127.0.0.1',
+      port: address.port,
+      token: 'test-token'
+    }));
+
+    const { stdout } = await execFileAsync(process.execPath, [
+      cli, '--project', project, '--width', '800', '--height', '600',
+      'preview', 'db://assets/ui/example.prefab', 'temp/example.png'
+    ]);
+    assert.equal(JSON.parse(stdout).renderer, 'scene:prefab-preview');
+    assert.equal(received.target, 'bridge');
+    assert.equal(received.method, 'export-prefab-preview');
+    assert.deepEqual(received.args, [{
+      asset: 'db://assets/ui/example.prefab',
+      output: 'temp/example.png',
+      width: 800,
+      height: 600
+    }]);
+  } finally {
+    await new Promise((resolveClose) => server.close(resolveClose));
+    await rm(project, { recursive: true, force: true });
+  }
+});

@@ -1,11 +1,28 @@
 {
   "package_version": 2,
   "name": "cocos-codex-bridge",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Local authenticated bridge for Cocos Creator 3.8 Codex skills",
   "author": "Codex",
   "editor": ">=3.8.0 <3.9.0",
   "main": "./main.js",
+  "panels": {
+    "preview": {
+      "title": "Cocos Codex Prefab Preview",
+      "type": "simple",
+      "main": "./preview.js",
+      "flags": {
+        "resizable": false,
+        "save": false
+      },
+      "size": {
+        "width": 1024,
+        "height": 768,
+        "min-width": 64,
+        "min-height": 64
+      }
+    }
+  },
   "contributions": {
     "scene": {
       "script": "./scene.js"
@@ -15,6 +32,12 @@
         "public": true,
         "methods": [
           "bridgeStatus"
+        ]
+      },
+      "render-prefab-preview": {
+        "public": false,
+        "methods": [
+          "preview.renderPrefab"
         ]
       }
     }

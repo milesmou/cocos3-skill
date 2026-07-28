@@ -9,6 +9,7 @@ function usage(message) {
     'Usage:',
     '  node cocos-editor.mjs --project <dir> status',
     '  node cocos-editor.mjs --project <dir> [--timeout <ms>] [--poll <ms>] wait <ready|idle>',
+    '  node cocos-editor.mjs --project <dir> [--width <px>] [--height <px>] preview <prefab-url-or-uuid> <output.png>',
     '  node cocos-editor.mjs --project <dir> request <scene|asset-db|scene-script> <method> [args-json]',
     '',
     'args-json must be a JSON array. Example:',
@@ -24,6 +25,8 @@ function parseArgs(argv) {
     if (argv[index] === '--project') options.project = argv[++index];
     else if (argv[index] === '--timeout') options.timeout = Number(argv[++index]);
     else if (argv[index] === '--poll') options.poll = Number(argv[++index]);
+    else if (argv[index] === '--width') options.width = Number(argv[++index]);
+    else if (argv[index] === '--height') options.height = Number(argv[++index]);
     else if (argv[index] === '--help' || argv[index] === '-h') usage();
     else positional.push(argv[index]);
   }
@@ -34,6 +37,8 @@ function parseArgs(argv) {
   options.argsJson = positional[3] || '[]';
   options.timeout = Number.isFinite(options.timeout) && options.timeout > 0 ? options.timeout : 15000;
   options.poll = Number.isFinite(options.poll) && options.poll >= 50 ? options.poll : 250;
+  options.width = Number.isFinite(options.width) ? options.width : 1024;
+  options.height = Number.isFinite(options.height) ? options.height : 768;
   return options;
 }
 
@@ -96,6 +101,19 @@ try {
     result = await requestBridge(info, { target: 'bridge', method: 'status', args: [] }, options.timeout);
   } else if (options.command === 'wait') {
     result = await waitFor(info, options.target, options.timeout, options.poll);
+  } else if (options.command === 'preview') {
+    if (!options.target) usage('preview Prefab URL or UUID is required');
+    if (!options.method) usage('preview output PNG path is required');
+    result = await requestBridge(info, {
+      target: 'bridge',
+      method: 'export-prefab-preview',
+      args: [{
+        asset: options.target,
+        output: options.method,
+        width: options.width,
+        height: options.height
+      }]
+    }, options.timeout);
   } else if (options.command === 'request') {
     if (!['scene', 'asset-db', 'scene-script'].includes(options.target)) usage('invalid request target');
     if (!options.method) usage('request method is required');
@@ -104,7 +122,7 @@ try {
     if (!Array.isArray(args)) usage('args-json must be a JSON array');
     result = await requestBridge(info, { target: options.target, method: options.method, args }, options.timeout);
   } else {
-    usage('command must be status, wait, or request');
+    usage('command must be status, wait, preview, or request');
   }
   console.log(JSON.stringify(result, null, 2));
 } catch (error) {

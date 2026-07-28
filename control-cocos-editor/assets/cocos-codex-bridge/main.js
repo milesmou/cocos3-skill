@@ -9,6 +9,7 @@ const packageJSON = require('./package.json');
 const HOST = '127.0.0.1';
 const MAX_BODY_BYTES = 2 * 1024 * 1024;
 const CONNECTION_FILE = 'cocos-codex-bridge.json';
+const PREVIEW_PANEL = `${packageJSON.name}.preview`;
 const ALLOWED_MESSAGES = {
   scene: new Set([
     'open-scene', 'save-scene', 'save-as-scene', 'close-scene',
@@ -40,6 +41,56 @@ function projectPath() {
   return Editor.Project.path;
 }
 
+function isWithin(parent, child) {
+  const value = path.relative(parent, child);
+  return value !== '..' && !value.startsWith(`..${path.sep}`) && !path.isAbsolute(value);
+}
+
+function requirePrefabPreviewVersion() {
+  const match = String(Editor.App.version || '').match(/^3\.8\.(\d+)/);
+  if (!match || Number(match[1]) < 5) {
+    throw new Error(`internal Prefab preview export requires Cocos Creator 3.8.5-3.8.x; found ${Editor.App.version || '<unknown>'}`);
+  }
+}
+
+async function exportPrefabPreview(options = {}) {
+  requirePrefabPreviewVersion();
+  if (typeof options.asset !== 'string' || !options.asset) throw new Error('preview asset URL, UUID, or path is required');
+  if (typeof options.output !== 'string' || !options.output) throw new Error('preview output PNG path is required');
+  const width = Number(options.width ?? 1024);
+  const height = Number(options.height ?? 768);
+  if (!Number.isInteger(width) || width < 64 || width > 4096) throw new Error('preview width must be an integer from 64 to 4096');
+  if (!Number.isInteger(height) || height < 64 || height > 4096) throw new Error('preview height must be an integer from 64 to 4096');
+
+  const info = await Editor.Message.request('asset-db', 'query-asset-info', options.asset);
+  if (!info?.uuid) throw new Error(`Prefab asset not found: ${options.asset}`);
+  const assetUrl = String(info.url || '');
+  if (!assetUrl.endsWith('.prefab') && info.importer !== 'prefab') {
+    throw new Error(`asset is not a Prefab: ${info.url || options.asset}`);
+  }
+
+  const output = path.resolve(projectPath(), options.output);
+  if (!isWithin(projectPath(), output)) throw new Error('preview output must stay inside the project');
+  if (path.extname(output).toLowerCase() !== '.png') throw new Error('preview output must use the .png extension');
+
+  const wasOpen = await Editor.Panel.has(PREVIEW_PANEL);
+  if (!wasOpen && !(await Editor.Panel.open(PREVIEW_PANEL))) {
+    throw new Error('failed to open the internal Prefab preview renderer panel');
+  }
+  try {
+    return await Editor.Message.request(packageJSON.name, 'render-prefab-preview', {
+      uuid: info.uuid,
+      url: info.url,
+      output,
+      width,
+      height,
+      settleFrames: Number.isInteger(options.settleFrames) ? options.settleFrames : 3
+    });
+  } finally {
+    if (!wasOpen) await Editor.Panel.close(PREVIEW_PANEL);
+  }
+}
+
 function writeJson(response, status, payload) {
   const body = JSON.stringify(payload);
   response.writeHead(status, {
@@ -64,15 +115,19 @@ async function readBody(request) {
 async function dispatch(payload) {
   const args = Array.isArray(payload.args) ? payload.args : [];
   if (payload.target === 'bridge') {
-    if (payload.method !== 'status') throw new Error(`unsupported bridge method: ${payload.method}`);
-    return {
-      name: packageJSON.name,
-      version: packageJSON.version,
-      creator: Editor.App.version,
-      project: projectPath(),
-      sceneReady: await Editor.Message.request('scene', 'query-is-ready'),
-      assetDbReady: await Editor.Message.request('asset-db', 'query-ready')
-    };
+    if (payload.method === 'status') {
+      return {
+        name: packageJSON.name,
+        version: packageJSON.version,
+        creator: Editor.App.version,
+        project: projectPath(),
+        sceneReady: await Editor.Message.request('scene', 'query-is-ready'),
+        assetDbReady: await Editor.Message.request('asset-db', 'query-ready'),
+        prefabPreviewPng: /^3\.8\.(?:[5-9]|\d{2,})/.test(String(Editor.App.version || ''))
+      };
+    }
+    if (payload.method === 'export-prefab-preview') return exportPrefabPreview(args[0]);
+    throw new Error(`unsupported bridge method: ${payload.method}`);
   }
   if (payload.target === 'scene-script') {
     if (typeof payload.method !== 'string' || !payload.method) throw new Error('scene-script method is required');

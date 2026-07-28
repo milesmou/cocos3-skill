@@ -54,6 +54,10 @@
 
 按 Creator 3.8 的 UI 约束拼装场景或 Prefab，组织 Canvas、UITransform、Widget、Layout、Mask、ScrollView、事件和嵌套 Prefab，并执行专用 UI 校验。
 
+### cocos-prefab-preview
+
+通过 Creator 3.8.5-3.8.x Inspector 使用的内部 WebGL 渲染器，以强制 2D 模式导出真实 Prefab PNG。
+
 ## 离线 Prefab 技能
 
 ### create-cocos-prefab
@@ -160,6 +164,7 @@ cocos-skill/
 ```powershell
 node control-cocos-editor/scripts/install-bridge.mjs --project <工程目录>
 node control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> status
+node control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> --timeout 60000 preview db://assets/ui/example.prefab temp/previews/example.png
 ```
 
 脚本会检查 `package.json` 中的 Creator 版本。桥接服务只监听 `127.0.0.1`，连接信息和一次性令牌保存在目标工程的 `temp` 目录。
