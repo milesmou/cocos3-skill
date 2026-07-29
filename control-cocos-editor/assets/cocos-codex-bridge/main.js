@@ -120,6 +120,7 @@ async function dispatch(payload) {
         name: packageJSON.name,
         version: packageJSON.version,
         creator: Editor.App.version,
+        editorDirectory: path.dirname(process.execPath),
         project: projectPath(),
         sceneReady: await Editor.Message.request('scene', 'query-is-ready'),
         assetDbReady: await Editor.Message.request('asset-db', 'query-ready'),

@@ -22,6 +22,8 @@ description: 安装并使用本地认证桥接扩展，通过 Cocos Creator 3.8 
    node scripts/cocos-editor.mjs --project <工程目录> status
    ```
 
+   返回结果中的 `editorDirectory` 是当前 Cocos Creator 编辑器的安装目录。
+
 4. 自动化流程不要使用固定延时，等待 Scene 与 AssetDB 就绪：
 
    ```powershell
