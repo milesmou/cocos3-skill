@@ -2,7 +2,7 @@
 
 本项目提供一组 Codex Skill，用于查询和操控 Cocos Creator 3.8 的场景、Prefab、节点、组件和资源。
 
-首选工作流通过 `cocos-codex-bridge` 扩展调用 Creator 官方 Scene、AssetDB 消息和 Scene Script API。原有直接修改 Prefab 序列化文件的脚本保留为编辑器无法启动时的离线后备。
+首选工作流通过 `cocos3-codex-bridge` 扩展调用 Creator 官方 Scene、AssetDB 消息和 Scene Script API。原有直接修改 Prefab 序列化文件的脚本保留为编辑器无法启动时的离线后备。
 
 ## 当前技能
 
@@ -108,7 +108,7 @@ Codex Skill
     ├─ control-cocos-editor/scripts/cocos-editor.mjs
     │       │  localhost + 临时令牌
     │       ▼
-    ├─ Creator 扩展 cocos-codex-bridge
+    ├─ Creator 扩展 cocos3-codex-bridge
     │       ├─ Editor.Message → scene / asset-db
     │       └─ execute-scene-script → cc / cce API
     │

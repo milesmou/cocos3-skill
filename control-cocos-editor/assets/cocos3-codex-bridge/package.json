@@ -1,6 +1,6 @@
 {
   "package_version": 2,
-  "name": "cocos-codex-bridge",
+  "name": "cocos3-codex-bridge",
   "version": "1.2.2",
   "description": "Local authenticated bridge for Cocos Creator 3.8 Codex skills",
   "author": "Codex",

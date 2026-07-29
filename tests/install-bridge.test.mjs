@@ -15,18 +15,18 @@ test('bridge installer installs and removes the extension in a Creator 3.8 proje
     await writeFile(join(project, 'package.json'), JSON.stringify({ creator: { version: '3.8.8' } }));
     await execFileAsync(process.execPath, [installer, '--project', project]);
 
-    const installedPackage = join(project, 'extensions', 'cocos-codex-bridge', 'package.json');
+    const installedPackage = join(project, 'extensions', 'cocos3-codex-bridge', 'package.json');
     const manifest = JSON.parse(await readFile(installedPackage, 'utf8'));
-    assert.equal(manifest.name, 'cocos-codex-bridge');
+    assert.equal(manifest.name, 'cocos3-codex-bridge');
     assert.equal(manifest.version, '1.2.2');
     assert.equal(manifest.panels.preview.main, './preview.js');
-    const installedScene = join(project, 'extensions', 'cocos-codex-bridge', 'scene.js');
+    const installedScene = join(project, 'extensions', 'cocos3-codex-bridge', 'scene.js');
     const sceneSource = await readFile(installedScene, 'utf8');
     assert.match(sceneSource, /'setEditClip'/);
-    const installedMain = join(project, 'extensions', 'cocos-codex-bridge', 'main.js');
+    const installedMain = join(project, 'extensions', 'cocos3-codex-bridge', 'main.js');
     const mainSource = await readFile(installedMain, 'utf8');
     assert.match(mainSource, /editorDirectory: path\.dirname\(process\.execPath\)/);
-    const installedPreview = join(project, 'extensions', 'cocos-codex-bridge', 'preview.js');
+    const installedPreview = join(project, 'extensions', 'cocos3-codex-bridge', 'preview.js');
     const previewSource = await readFile(installedPreview, 'utf8');
     assert.match(previewSource, /callPreview\('is2DView'\)/);
     assert.match(previewSource, /callPreview\('viewToggle'\)/);

@@ -43,7 +43,7 @@ const version = String(projectPackage?.creator?.version || '');
 if (!/^3\.8(?:\.|$)/.test(version)) usage(`expected Cocos Creator 3.8.x, found ${version || '<missing>'}`);
 
 const extensionsDir = resolve(project, 'extensions');
-const target = resolve(extensionsDir, 'cocos-codex-bridge');
+const target = resolve(extensionsDir, 'cocos3-codex-bridge');
 if (!isWithin(project, target)) usage('resolved extension path escapes the project');
 
 if (options.remove) {
@@ -52,7 +52,7 @@ if (options.remove) {
   process.exit(0);
 }
 
-const source = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'assets', 'cocos-codex-bridge');
+const source = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'assets', 'cocos3-codex-bridge');
 if (await exists(target)) {
   if (!options.force) usage(`extension already exists: ${target}; pass --force to replace it`);
   await rm(target, { recursive: true, force: true });
@@ -60,4 +60,4 @@ if (await exists(target)) {
 await mkdir(extensionsDir, { recursive: true });
 await cp(source, target, { recursive: true, errorOnExist: true });
 console.log(`Installed ${target}`);
-console.log('Enable or refresh cocos-codex-bridge in Cocos Creator Extension Manager.');
+console.log('Enable or refresh cocos3-codex-bridge in Cocos Creator Extension Manager.');

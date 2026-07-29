@@ -43,7 +43,7 @@ function parseArgs(argv) {
 }
 
 async function connection(project) {
-  const file = resolve(project, 'temp', 'cocos-codex-bridge.json');
+  const file = resolve(project, 'temp', 'cocos3-codex-bridge.json');
   let data;
   try { data = JSON.parse(await readFile(file, 'utf8')); }
   catch { throw new Error(`bridge connection file not found: ${file}; install/enable the extension and keep Creator open`); }

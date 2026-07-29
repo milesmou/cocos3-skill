@@ -15,7 +15,7 @@ description: 安装并使用本地认证桥接扩展，通过 Cocos Creator 3.8 
    node scripts/install-bridge.mjs --project <工程目录>
    ```
 
-2. 在 Creator 的扩展管理器中刷新并启用 `cocos-codex-bridge`。
+2. 在 Creator 的扩展管理器中刷新并启用 `cocos3-codex-bridge`。
 3. 检查连接：
 
    ```powershell
@@ -31,7 +31,7 @@ description: 安装并使用本地认证桥接扩展，通过 Cocos Creator 3.8 
    node scripts/cocos-editor.mjs --project <工程目录> --timeout 60000 wait idle
    ```
 
-连接文件只写入目标工程的 `temp/cocos-codex-bridge.json`，服务只监听 `127.0.0.1`，每次扩展启动都会生成新令牌。
+连接文件只写入目标工程的 `temp/cocos3-codex-bridge.json`，服务只监听 `127.0.0.1`，每次扩展启动都会生成新令牌。
 
 ## 调用
 

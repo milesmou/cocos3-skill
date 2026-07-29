@@ -26,7 +26,7 @@ test('editor CLI authenticates and forwards a request to the local bridge', asyn
     await new Promise((resolveListen) => server.listen(0, '127.0.0.1', resolveListen));
     const address = server.address();
     await mkdir(join(project, 'temp'));
-    await writeFile(join(project, 'temp', 'cocos-codex-bridge.json'), JSON.stringify({
+    await writeFile(join(project, 'temp', 'cocos3-codex-bridge.json'), JSON.stringify({
       schema: 1,
       host: '127.0.0.1',
       port: address.port,
@@ -65,7 +65,7 @@ test('editor CLI waits until AssetDB becomes idle', async () => {
     await new Promise((resolveListen) => server.listen(0, '127.0.0.1', resolveListen));
     const address = server.address();
     await mkdir(join(project, 'temp'));
-    await writeFile(join(project, 'temp', 'cocos-codex-bridge.json'), JSON.stringify({
+    await writeFile(join(project, 'temp', 'cocos3-codex-bridge.json'), JSON.stringify({
       schema: 1,
       host: '127.0.0.1',
       port: address.port,
@@ -100,7 +100,7 @@ test('editor CLI requests internal Prefab PNG export', async () => {
     await new Promise((resolveListen) => server.listen(0, '127.0.0.1', resolveListen));
     const address = server.address();
     await mkdir(join(project, 'temp'));
-    await writeFile(join(project, 'temp', 'cocos-codex-bridge.json'), JSON.stringify({
+    await writeFile(join(project, 'temp', 'cocos3-codex-bridge.json'), JSON.stringify({
       schema: 1,
       host: '127.0.0.1',
       port: address.port,

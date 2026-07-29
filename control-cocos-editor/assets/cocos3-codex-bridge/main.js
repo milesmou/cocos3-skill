@@ -8,7 +8,7 @@ const packageJSON = require('./package.json');
 
 const HOST = '127.0.0.1';
 const MAX_BODY_BYTES = 2 * 1024 * 1024;
-const CONNECTION_FILE = 'cocos-codex-bridge.json';
+const CONNECTION_FILE = 'cocos3-codex-bridge.json';
 const PREVIEW_PANEL = `${packageJSON.name}.preview`;
 const ALLOWED_MESSAGES = {
   scene: new Set([
