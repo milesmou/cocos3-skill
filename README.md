@@ -156,14 +156,15 @@ cocos-skill/
 ## 环境要求
 
 - Cocos Creator 3.8.x
-- Cocos Dashboard；启动或重新启动工程必须从 Dashboard 的工程入口进行
+- 可用的 `cocoscreator` 命令
 - 同一个工程最多运行一个 Creator 实例；启动前先检查，已打开时复用现有实例
 - Node.js 18 或更高版本
 - 目标工程必须包含有效的 `package.json` 和 `assets` 目录
 
-在线控制前，先确认目标工程没有已运行的 Creator 实例。工程已打开时直接复用，禁止重复启动；工程未打开时通过 Cocos Dashboard 打开。不要直接运行 Creator 可执行文件或通过命令行参数启动工程。需要重启时，先完全关闭旧实例，再从 Dashboard 启动。然后在目标工程安装并启用桥接扩展：
+在线控制前，先确认目标工程没有已运行的 Creator 实例。工程已打开时直接复用，禁止重复启动；工程未打开时使用 `cocoscreator --project <工程目录>` 启动。需要重启时，先完全关闭旧实例，再执行启动命令。然后在目标工程安装并启用桥接扩展：
 
 ```powershell
+cocoscreator --project <工程目录>
 node control-cocos-editor/scripts/install-bridge.mjs --project <工程目录>
 node control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> status
 node control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> --timeout 60000 preview db://assets/ui/example.prefab temp/previews/example.png

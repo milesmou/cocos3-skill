@@ -10,7 +10,13 @@ description: 安装并使用本地认证桥接扩展，通过 Cocos Creator 3.8 
 ## 首次安装
 
 1. 先确认目标工程是否已有 Creator 实例。每个工程最多只能运行一个实例；如果工程已经打开，必须复用现有实例，不得再次启动。
-2. 工程未打开时，必须通过 Cocos Dashboard 启动：在 Dashboard 中添加或定位工程，并点击工程入口打开匹配版本的 Creator。不要直接运行 Creator 可执行文件，也不要通过命令行参数启动工程。需要重启时，先完全关闭该工程的现有 Creator 实例，再从 Dashboard 启动。
+2. 工程未打开时，使用 `cocoscreator` 命令启动目标工程：
+
+   ```powershell
+   cocoscreator --project <工程目录>
+   ```
+
+   需要重启时，先完全关闭该工程的现有 Creator 实例，再执行启动命令。
 3. 安装桥接扩展：
 
    ```powershell
@@ -59,7 +65,7 @@ node scripts/cocos-editor.mjs --project <工程目录> --timeout 60000 --width 1
 
 ## 安全规则
 
-- 启动或重新启动工程时必须使用 Cocos Dashboard，不直接启动 Creator 编辑器。
+- 启动或重新启动工程时使用 `cocoscreator --project <工程目录>`。
 - 同一个工程最多运行一个 Creator 实例；启动前检查现有实例，已打开时直接复用。重启时必须先完全关闭旧实例。
 - 修改前先查询目标 UUID、当前属性和 Prefab 状态。
 - 优先使用 `scene` 消息执行修改，以进入 Creator 撤销记录。
