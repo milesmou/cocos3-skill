@@ -1,9 +1,11 @@
 ---
 name: import-cocos-assets
-description: 使用 Node.js 将外部资源复制并导入 Cocos Creator 3.8 工程，生成兼容的 .meta、主 UUID 和子资源 UUID。适用于导入 PNG、TypeScript、JavaScript、JSON、文本、MP3、Effect、Material 以及 Spine skel/atlas/png 资源组。
+description: 使用 Node.js 离线导入 Cocos Creator 3.8 外部资源并生成 .meta、主 UUID 和子资源 UUID。仅在 Creator 未运行且无法使用 AssetDB 桥接时作为后备；编辑器可用时应使用在线资源管理。
 ---
 
 # 导入 Cocos 外部资源
+
+仅在目标工程的 Creator 未运行且无法使用编辑器桥接时执行。编辑器可用时，改用 `manage-cocos-assets` 的 AssetDB 导入流程。
 
 使用技能内置脚本复制资源并生成 Creator 3.8 元数据。不要手工复制样本 `.meta`，以免不同工程之间发生 UUID 冲突。
 

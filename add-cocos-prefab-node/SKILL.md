@@ -1,9 +1,11 @@
 ---
 name: add-cocos-prefab-node
-description: 使用 Node.js 向现有 Cocos Creator 3.8 Prefab 添加空 UI 子节点。适用于在 Prefab 根节点或指定节点路径下创建、添加或插入空节点，同时保留已有序列化数据。
+description: 使用 Node.js 离线向 Cocos Creator 3.8 Prefab 添加空 UI 子节点。仅在 Creator 未运行且无法使用编辑器桥接时作为后备；编辑器可用时应使用在线节点管理。
 ---
 
 # 添加 Cocos Prefab 节点
+
+仅在目标工程的 Creator 未运行且无法使用编辑器桥接时执行。编辑器可用时，改用 `manage-cocos-node`。
 
 使用技能内置脚本修改 Prefab。不要手动调整序列化 `__id__` 引用或 Prefab fileId。
 

@@ -1,9 +1,11 @@
 ---
 name: rename-cocos-asset
-description: 使用 Node.js 重命名 Cocos Creator 3.8 工程中的资源及其配套 .meta 文件。适用于在原目录修改文件或目录资源名称，同时保持 meta 内容和 UUID 不变。
+description: 使用 Node.js 离线重命名 Cocos Creator 3.8 资源及配套 .meta，并保持 UUID。仅在 Creator 未运行且无法使用 AssetDB 桥接时作为后备；编辑器可用时应使用在线资源管理。
 ---
 
 # 重命名 Cocos 资源
+
+仅在目标工程的 Creator 未运行且无法使用编辑器桥接时执行。编辑器可用时，改用 `manage-cocos-assets` 的 AssetDB 移动流程。
 
 使用技能内置脚本同步重命名资源和 `.meta`。不要创建新的 `.meta`。
 

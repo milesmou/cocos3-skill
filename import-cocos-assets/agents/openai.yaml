@@ -1,4 +1,4 @@
 interface:
   display_name: "导入 Cocos 外部资源"
-  short_description: "复制外部资源并生成 Creator 3.8 元数据"
-  default_prompt: "使用 $import-cocos-assets 将外部资源导入 Cocos Creator 3.8 工程。"
+  short_description: "在 Creator 离线状态下导入资源并生成兼容元数据"
+  default_prompt: "使用 $import-cocos-assets 在 Creator 未运行且 AssetDB 桥接不可用时离线导入资源。"

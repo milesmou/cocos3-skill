@@ -1,9 +1,11 @@
 ---
 name: add-cocos-node-component
-description: 使用 Node.js 向现有 Cocos Creator 3.8 Prefab 节点添加常用内置 2D、UI、渲染、媒体或自定义 TypeScript 组件。适用于挂载、添加或配置组件，同时保留序列化对象引用。
+description: 使用 Node.js 离线向 Cocos Creator 3.8 Prefab 节点添加内置或自定义 TypeScript 组件。仅在 Creator 未运行且无法使用编辑器桥接时作为后备；编辑器可用时应使用在线组件管理。
 ---
 
 # 添加 Cocos 节点组件
+
+仅在目标工程的 Creator 未运行且无法使用编辑器桥接时执行。编辑器可用时，改用 `manage-cocos-components`。
 
 使用技能内置脚本修改 Prefab。自定义脚本类型必须根据其 `.meta` UUID 计算，不要将类名直接用作序列化 `__type__`。
 

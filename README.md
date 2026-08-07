@@ -50,9 +50,13 @@
 
 查询 AnimationClip dump，并通过 Creator 动画管理器提交和保存动画操作。
 
+### plan-cocos-prefab-tree
+
+只读分析自然语言、效果图或现有界面，生成经过一致性检查的 Prefab 节点蓝图；本技能不修改工程，实际创建交由 `assemble-cocos-ui`。
+
 ### assemble-cocos-ui
 
-按 Creator 3.8 的 UI 约束拼装场景或 Prefab，组织 Canvas、UITransform、Widget、Layout、Mask、ScrollView、事件和嵌套 Prefab，并执行专用 UI 校验。
+根据 `plan-cocos-prefab-tree` 或用户提供的明确蓝图执行场景或 Prefab 拼装，组织 Canvas、UITransform、Widget、Layout、Mask、ScrollView、事件和嵌套 Prefab，并执行专用 UI 校验。
 
 ### cocos-prefab-preview
 
@@ -132,6 +136,7 @@ cocos-skill/
 ├── create-cocos-component-script/
 ├── manage-cocos-event-handlers/
 ├── manage-cocos-animation/
+├── plan-cocos-prefab-tree/
 ├── assemble-cocos-ui/
 ├── create-cocos-prefab/
 ├── add-cocos-prefab-node/

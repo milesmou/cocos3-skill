@@ -1,9 +1,11 @@
 ---
 name: set-cocos-component-properties
-description: 使用 Node.js 为 Cocos Creator 3.8 Prefab 中的内置或自定义组件设置序列化属性。适用于设置属性检查器中的基础类型、枚举、Vec2、Vec3、Color、数组、节点引用、组件引用和资源 UUID 引用。
+description: 使用 Node.js 离线设置 Cocos Creator 3.8 Prefab 组件的基础值、值类型及对象或资源引用。仅在 Creator 未运行且无法使用编辑器桥接时作为后备；编辑器可用时应使用在线组件管理。
 ---
 
 # 设置 Cocos 组件属性
+
+仅在目标工程的 Creator 未运行且无法使用编辑器桥接时执行。编辑器可用时，改用 `manage-cocos-components`。
 
 使用技能内置脚本设置属性。应使用语义化引用描述符，不要手写 Prefab 对象 ID。
 

@@ -1,9 +1,11 @@
 ---
 name: move-cocos-asset
-description: 使用 Node.js 在 Cocos Creator 3.8 工程的 assets 内移动资源及其配套 .meta 文件。适用于改变文件或目录资源的位置，同时保持资源名称、meta 内容和 UUID 不变。
+description: 使用 Node.js 离线移动 Cocos Creator 3.8 资源及配套 .meta，并保持 UUID。仅在 Creator 未运行且无法使用 AssetDB 桥接时作为后备；编辑器可用时应使用在线资源管理。
 ---
 
 # 移动 Cocos 资源
+
+仅在目标工程的 Creator 未运行且无法使用编辑器桥接时执行。编辑器可用时，改用 `manage-cocos-assets` 的 AssetDB 移动流程。
 
 使用技能内置脚本成对移动资源和 `.meta`。不要只移动资源本体，否则 Creator 会生成新 UUID。
 

@@ -1,9 +1,11 @@
 ---
 name: remove-cocos-node-component
-description: 使用 Node.js 从 Cocos Creator 3.8 Prefab 节点安全移除内置或自定义组件。适用于删除节点组件、清理对应 CompPrefabInfo，并在对象表缩减后重映射全部序列化 __id__ 引用。
+description: 使用 Node.js 离线移除 Cocos Creator 3.8 Prefab 节点组件并重映射序列化 __id__。仅在 Creator 未运行且无法使用编辑器桥接时作为后备；编辑器可用时应使用在线组件管理。
 ---
 
 # 移除 Cocos 节点组件
+
+仅在目标工程的 Creator 未运行且无法使用编辑器桥接时执行。编辑器可用时，改用 `manage-cocos-components`。
 
 使用技能内置脚本修改 Prefab。不要手动删除对象表条目或调整 `__id__`。
 

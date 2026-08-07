@@ -1,9 +1,11 @@
 ---
 name: remove-cocos-prefab-node
-description: 使用 Node.js 从 Cocos Creator 3.8 Prefab 安全删除节点及其完整子树。适用于移除节点、后代节点、所属组件和 Prefab 关联对象，并在对象表压缩后重映射全部序列化 __id__。
+description: 使用 Node.js 离线删除 Cocos Creator 3.8 Prefab 节点子树并重映射序列化 __id__。仅在 Creator 未运行且无法使用编辑器桥接时作为后备；编辑器可用时应使用在线节点管理。
 ---
 
 # 删除 Cocos Prefab 节点
+
+仅在目标工程的 Creator 未运行且无法使用编辑器桥接时执行。编辑器可用时，改用 `manage-cocos-node`。
 
 使用技能内置脚本删除节点。不要手动删除对象表记录或修改 `__id__`。
 

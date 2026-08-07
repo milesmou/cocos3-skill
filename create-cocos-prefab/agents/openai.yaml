@@ -1,4 +1,4 @@
 interface:
   display_name: "创建 Cocos Prefab"
-  short_description: "为 Cocos Creator 3.8 工程创建空预制体"
-  default_prompt: "使用 $create-cocos-prefab 在指定的 Cocos Creator 3.8 工程中创建空 Prefab。"
+  short_description: "在 Creator 离线状态下创建空 Prefab 及配套元数据"
+  default_prompt: "使用 $create-cocos-prefab 在 Creator 未运行且桥接不可用时离线创建空 Prefab。"

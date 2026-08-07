@@ -1,9 +1,11 @@
 ---
 name: create-cocos-prefab
-description: 使用 Node.js 在 Cocos Creator 3.8 工程中创建空 UI Prefab 资源。适用于在工程 assets 目录下创建、生成或添加新的空 .prefab 文件及其配套 .meta 文件。
+description: 使用 Node.js 在 Cocos Creator 3.8 工程中离线创建空 UI Prefab 及配套 .meta。仅在 Creator 未运行且无法使用编辑器桥接时作为后备；编辑器可用时应通过在线 Prefab 管理流程创建资源。
 ---
 
 # 创建 Cocos Prefab
+
+仅在目标工程的 Creator 未运行且无法使用编辑器桥接时执行。编辑器可用时，改用 `manage-cocos-prefab-instance` 和 `manage-cocos-assets`。
 
 使用技能内置脚本创建资源。不要手动编写 UUID 或 Prefab fileId。
 

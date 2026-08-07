@@ -1,16 +1,18 @@
 ---
 name: assemble-cocos-ui
-description: 通过 Cocos Creator 3.8 编辑器拼装、重构和验收 UI 场景或 Prefab，覆盖 Canvas、UITransform、Widget、Layout、Sprite、Label、Mask、ScrollView、交互组件、事件绑定及嵌套 Prefab。适用于按设计稿搭界面、组合可复用控件、批量调整布局和检查多分辨率适配问题。
+description: 根据明确的节点蓝图或执行规格，通过 Cocos Creator 3.8 编辑器拼装、重构和验收 UI 场景或 Prefab。适用于执行已规划的组件、布局、资源、事件、嵌套 Prefab 和适配方案；只有自然语言需求或设计稿而没有蓝图时，先使用 plan-cocos-prefab-tree。
 ---
 
 # 拼装 Cocos UI
+
+本技能只负责执行和验收，不负责从原始需求推导节点结构。输入没有明确节点蓝图或执行规格时，先使用 `plan-cocos-prefab-tree`。
 
 先连接 `control-cocos-editor`，再组合使用 `manage-cocos-node`、`manage-cocos-components`、`manage-cocos-assets`、`manage-cocos-prefab-instance` 和 `manage-cocos-event-handlers`。详细约束见 [references/ui-rules.md](references/ui-rules.md)。
 
 ## 工作流
 
 1. 等待编辑器就绪，保存当前上下文，并用 `inspectUILayout` 记录基线。
-2. 确认目标 Canvas、设计分辨率策略、目标 Prefab URL、所需资源 UUID 和可复用 Prefab。
+2. 核对蓝图中的目标 Canvas、设计分辨率策略、目标 Prefab URL、所需资源 UUID 和可复用 Prefab；发现结构性缺口时返回规划阶段补全，不在执行阶段自行改变蓝图。
 3. 先创建容器层级，再实例化可复用控件；节点创建后立即记录返回的 UUID，不依赖易歧义路径。
 4. 按顺序配置：
    - 未特意指定 Layer 时，将新建 Prefab 的根节点及全部后代节点统一设置为 `UI_2D`（`33554432`）。

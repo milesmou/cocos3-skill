@@ -1,9 +1,11 @@
 ---
 name: rename-cocos-prefab-node
-description: 使用 Node.js 修改 Cocos Creator 3.8 Prefab 中的节点名称。适用于按节点路径重命名根节点或子节点，并提供同级重名保护、根 Prefab 名称同步和 meta syncNodeName 同步。
+description: 使用 Node.js 离线修改 Cocos Creator 3.8 Prefab 节点名称，并同步根 Prefab 名称和 meta syncNodeName。仅在 Creator 未运行且无法使用编辑器桥接时作为后备；编辑器可用时应使用在线节点管理。
 ---
 
 # 修改 Cocos Prefab 节点名称
+
+仅在目标工程的 Creator 未运行且无法使用编辑器桥接时执行。编辑器可用时，改用 `manage-cocos-node`。
 
 使用技能内置脚本改名，不要通过文本替换修改 Prefab。
 

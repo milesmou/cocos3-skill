@@ -1,4 +1,4 @@
 interface:
   display_name: "移动 Cocos 资源"
-  short_description: "连同 meta 一起移动资源并保持 UUID"
-  default_prompt: "使用 $move-cocos-asset 移动 Cocos Creator 资源及其 meta 文件。"
+  short_description: "在 Creator 离线状态下移动资源和 meta 并保持 UUID"
+  default_prompt: "使用 $move-cocos-asset 在 Creator 未运行且 AssetDB 桥接不可用时离线移动资源。"
