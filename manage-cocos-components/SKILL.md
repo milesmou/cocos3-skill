@@ -12,10 +12,15 @@ description: 通过 Cocos Creator 3.8 编辑器查询可注册组件和节点组
 ```powershell
 node ../control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> request scene query-components '[]'
 node ../control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> request scene-script listComponents '[{"uuid":"<节点UUID>"}]'
+```
+
+添加任何组件前，必须先调用 `listComponents` 检查目标节点。按注册类名判断节点是否已有目标组件：已有则复用其组件 UUID，并根据需要修改属性；只有缺失时才执行添加：
+
+```powershell
 node ../control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> request scene create-component '[{"uuid":"<节点UUID>","component":"cc.Label"}]'
 ```
 
-自定义组件必须先确认脚本已成功导入，并使用 `query-classes` 或 `query-components` 返回的注册类名。
+不要在同一节点重复添加同类型组件。自定义组件必须先确认脚本已成功导入，并使用 `query-classes` 或 `query-components` 返回的注册类名进行检查和添加。
 
 ## 设置属性
 

@@ -10,16 +10,15 @@ const RESERVED_PROPERTIES = new Set(['__type__', '_name', '_objFlags', '__editor
 
 function usage(message) {
   if (message) console.error(`Error: ${message}\n`);
-  console.error('Usage: node add-component.mjs --project <dir> --prefab <path> --node <node/path> (--component <type> | --script <assets-relative-path>) [--properties <json>] [--allow-duplicate]');
+  console.error('Usage: node add-component.mjs --project <dir> --prefab <path> --node <node/path> (--component <type> | --script <assets-relative-path>) [--properties <json>]');
   process.exit(message ? 1 : 0);
 }
 
 function parseArgs(argv) {
-  const options = { allowDuplicate: false };
+  const options = {};
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
-    if (arg === '--allow-duplicate') options.allowDuplicate = true;
-    else if (arg === '--list-components') options.listComponents = true;
+    if (arg === '--list-components') options.listComponents = true;
     else if (arg === '--help' || arg === '-h') usage();
     else if (['--project', '--prefab', '--node', '--component', '--script', '--properties'].includes(arg)) {
       const value = argv[++index];
@@ -245,7 +244,7 @@ if (options.properties) {
 }
 
 const existingTypes = node._components.map((entry) => objects[entry?.__id__]?.__type__);
-if (!options.allowDuplicate && existingTypes.includes(componentType)) usage(`node ${node._name} already has component ${componentType}`);
+if (existingTypes.includes(componentType)) usage(`node ${node._name} already has component ${componentType}; reuse the existing component instead of adding a duplicate`);
 
 const componentId = objects.length;
 const prefabInfoId = componentId + 1;
