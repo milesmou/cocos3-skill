@@ -22,7 +22,7 @@ description: 使用 Node.js 将外部资源复制并导入 Cocos Creator 3.8 工
    node scripts/import-assets.mjs --project <工程目录> --source <外部文件或目录> --destination <assets相对目录>
    ```
 
-4. 默认拒绝覆盖目标文件。只有用户明确要求更新已有资源时才使用 `--force`；此时保留已有 `.meta` 和 UUID。
+4. 导入前检查工程目标目录中的同名资源及其 `.meta`。若名称已存在，默认在扩展名前追加递增编号（如 `icon.png` 改为 `icon_1.png`），直到名称可用；不要覆盖或复用同名资源。只有用户明确要求更新已有资源时才使用 `--force`；此时保留已有 `.meta` 和 UUID。
 5. 导入完成后让 Creator 刷新资源数据库，并检查控制台导入错误。
 
 ## 支持类型
@@ -32,6 +32,6 @@ description: 使用 Node.js 将外部资源复制并导入 Cocos Creator 3.8 工
 - `.json` / `.txt`：`JsonAsset` / `TextAsset`。
 - `.mp3`：`AudioClip`。
 - `.effect` / `.mtl`：Effect / Cocos Material；`.mtl` 内容必须是 `cc.Material` JSON。
-- `.skel + .atlas + .png`：Spine SkeletonData 资源组；脚本按同名 atlas 自动建立关联。
+- `.skel + .atlas + .png`：Spine SkeletonData 资源组；脚本按同名 atlas 自动建立关联，并在 PNG 因重名而改名时同步更新 atlas 中的图片路径。
 
 源目录中的 `.meta` 会被忽略。当前不支持的扩展名应停止并报告，不要猜测 importer。

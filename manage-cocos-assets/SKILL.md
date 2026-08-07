@@ -16,6 +16,8 @@ node ../control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> r
 
 ## 创建、导入和复制
 
+导入前先用 `query-asset-info` 检查目标目录中的目标 URL。若同名资源已存在，先生成一个同目录下未占用的新名称（在扩展名前追加递增编号，如 `icon_1.png`），再执行导入；不要覆盖已有资源。只有用户明确要求更新现有资源时，才沿用已有 URL。
+
 ```powershell
 node ../control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> request asset-db create-asset '["db://assets/data/example.txt","content"]'
 node ../control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> request asset-db import-asset '["D:/source/icon.png","db://assets/textures/icon.png"]'

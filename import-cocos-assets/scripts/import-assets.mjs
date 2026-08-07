@@ -47,6 +47,25 @@ function isWithin(parent, child) {
   return rel !== '..' && !rel.startsWith(`..${sep}`) && !isAbsolute(rel);
 }
 
+function pathKey(path) {
+  return resolve(path).toLowerCase();
+}
+
+async function destinationAvailable(path, reserved) {
+  return !reserved.has(pathKey(path)) && !(await exists(path)) && !(await exists(`${path}.meta`));
+}
+
+async function chooseAvailableDestination(path, reserved) {
+  if (await destinationAvailable(path, reserved)) return path;
+  const extension = extname(path);
+  const stem = basename(path, extension);
+  const parent = dirname(path);
+  for (let suffix = 1; ; suffix += 1) {
+    const candidate = join(parent, `${stem}_${suffix}${extension}`);
+    if (await destinationAvailable(candidate, reserved)) return candidate;
+  }
+}
+
 async function collectFiles(sourcePath) {
   const sourceStat = await stat(sourcePath);
   if (sourceStat.isFile()) return [{ source: sourcePath, relativePath: basename(sourcePath) }];
@@ -117,6 +136,28 @@ function directoryMeta() {
   return { ver: '1.2.0', importer: 'directory', imported: true, uuid: randomUUID(), files: [], subMetas: {}, userData: {} };
 }
 
+async function atlasContents(entry, byRelative) {
+  const contents = await readFile(entry.source, 'utf8');
+  const parts = contents.split(/(\r?\n)/);
+  let pageCandidate = true;
+  for (let index = 0; index < parts.length; index += 2) {
+    const line = parts[index];
+    const value = line.trim();
+    if (!value) {
+      pageCandidate = true;
+      continue;
+    }
+    if (!pageCandidate) continue;
+    pageCandidate = false;
+    const normalized = join(dirname(entry.relativePath), value).replaceAll('\\', '/').toLowerCase();
+    const texture = byRelative.get(normalized);
+    if (!texture || texture.extension !== '.png' || !texture.renamed) continue;
+    const renamedPath = relative(dirname(entry.destination), texture.destination).replaceAll('\\', '/');
+    parts[index] = line.replace(value, renamedPath);
+  }
+  return parts.join('');
+}
+
 async function ensureDirectoryChain(assetsDir, directory) {
   const relativeDirectory = relative(assetsDir, directory);
   let current = assetsDir;
@@ -150,11 +191,20 @@ try {
     if (extension === '.meta') continue;
     if (extension !== '.png' && extension !== '.skel' && !TYPE_INFO.has(extension)) throw new Error(`unsupported asset type: ${entry.relativePath}`);
     entry.extension = extension;
-    entry.destination = resolve(destinationDir, entry.relativePath);
-    if (!isWithin(destinationDir, entry.destination) && entry.destination !== destinationDir) throw new Error(`unsafe relative path: ${entry.relativePath}`);
-    if (entry.source === entry.destination) throw new Error(`source and destination are the same file: ${entry.source}`);
-    if (!options.force && (await exists(entry.destination) || await exists(`${entry.destination}.meta`))) throw new Error(`destination already exists: ${entry.destination}`);
+    entry.requestedDestination = resolve(destinationDir, entry.relativePath);
+    if (!isWithin(destinationDir, entry.requestedDestination) && entry.requestedDestination !== destinationDir) throw new Error(`unsafe relative path: ${entry.relativePath}`);
+    if (entry.source === entry.requestedDestination) throw new Error(`source and destination are the same file: ${entry.source}`);
     supported.push(entry);
+  }
+
+  const reservedDestinations = new Set();
+  for (const entry of supported) {
+    entry.destination = options.force
+      ? entry.requestedDestination
+      : await chooseAvailableDestination(entry.requestedDestination, reservedDestinations);
+    reservedDestinations.add(pathKey(entry.destination));
+    entry.destinationRelativePath = relative(destinationDir, entry.destination);
+    entry.renamed = pathKey(entry.destination) !== pathKey(entry.requestedDestination);
   }
 
   const byRelative = new Map(supported.map((entry) => [entry.relativePath.replaceAll('\\', '/').toLowerCase(), entry]));
@@ -190,11 +240,15 @@ try {
     await ensureDirectoryChain(assetsDir, destinationDir);
     for (const entry of supported) {
       await ensureDirectoryChain(assetsDir, dirname(entry.destination));
-      await copyFile(entry.source, entry.destination);
+      if (entry.extension === '.atlas') await writeFile(entry.destination, await atlasContents(entry, byRelative), 'utf8');
+      else await copyFile(entry.source, entry.destination);
       if (!entry.existingMeta) await writeFile(`${entry.destination}.meta`, `${JSON.stringify(entry.meta, null, 2)}\n`, 'utf8');
     }
   }
 
   console.log(`${options.dryRun ? 'Validated import of' : 'Imported'} ${supported.length} asset(s) to ${destinationDir}`);
-  for (const entry of supported) console.log(`${entry.relativePath} -> ${entry.existingMeta ? 'preserve existing meta' : entry.meta.importer} (${entry.uuid})`);
+  for (const entry of supported) {
+    const rename = entry.renamed ? ` -> ${entry.destinationRelativePath} (renamed)` : '';
+    console.log(`${entry.relativePath}${rename} -> ${entry.existingMeta ? 'preserve existing meta' : entry.meta.importer} (${entry.uuid})`);
+  }
 } catch (error) { usage(error.message); }
