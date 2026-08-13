@@ -1,4 +1,0 @@
-interface:
-  display_name: "设置 Cocos 组件属性"
-  short_description: "在 Creator 离线状态下设置 Prefab 组件属性和引用"
-  default_prompt: "使用 $set-cocos-component-properties 在 Creator 未运行且桥接不可用时离线设置 Prefab 组件属性。"

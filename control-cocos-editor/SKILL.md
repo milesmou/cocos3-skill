@@ -5,7 +5,7 @@ description: 安装并使用本地认证桥接扩展，通过 Cocos Creator 3.8 
 
 # 控制 Cocos Creator 编辑器
 
-优先通过 Creator 官方消息修改打开的场景、Prefab 和资源。只有编辑器无法启动时，才使用现有离线 Prefab 脚本。
+通过 Creator 官方消息修改打开的场景、Prefab 和资源，不直接改写 Prefab 序列化文件。
 
 ## 首次安装
 

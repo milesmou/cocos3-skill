@@ -1,4 +1,0 @@
-interface:
-  display_name: "移除 Cocos 节点组件"
-  short_description: "在 Creator 离线状态下移除组件并重映射 Prefab 引用"
-  default_prompt: "使用 $remove-cocos-node-component 在 Creator 未运行且桥接不可用时离线移除 Prefab 组件。"

@@ -1,4 +1,0 @@
-interface:
-  display_name: "修改 Cocos 节点名称"
-  short_description: "在 Creator 离线状态下安全修改 Prefab 节点名称"
-  default_prompt: "使用 $rename-cocos-prefab-node 在 Creator 未运行且桥接不可用时离线修改 Prefab 节点名称。"
