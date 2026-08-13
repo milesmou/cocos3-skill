@@ -66,7 +66,7 @@
 
 ### create-cocos-prefab
 
-创建空 UI Prefab 及配套 `.meta` 文件，可指定根节点尺寸，并保护现有资源不被意外覆盖。
+创建空 UI Prefab、父目录元数据及配套 `.meta` 文件，可指定根节点尺寸，并保护现有资源不被意外覆盖。使用 `--force` 时保留现有资源 UUID。
 
 ### add-cocos-prefab-node
 

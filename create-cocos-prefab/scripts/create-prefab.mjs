@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 import { randomBytes, randomUUID } from 'node:crypto';
-import { access, mkdir, readFile, writeFile } from 'node:fs/promises';
-import { basename, dirname, extname, isAbsolute, relative, resolve, sep } from 'node:path';
+import { access, mkdir, readFile, rename, rm, stat, writeFile } from 'node:fs/promises';
+import { basename, dirname, extname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 
 function usage(message) {
   if (message) console.error(`Error: ${message}\n`);
@@ -43,6 +43,85 @@ function isWithin(parent, child) {
   return rel !== '..' && !rel.startsWith(`..${sep}`) && !isAbsolute(rel);
 }
 
+async function exists(path) {
+  try { await access(path); return true; } catch { return false; }
+}
+
+function directoryMeta() {
+  return { ver: '1.2.0', importer: 'directory', imported: true, uuid: randomUUID(), files: [], subMetas: {}, userData: {} };
+}
+
+async function writeNewFileAtomically(path, contents) {
+  const temporary = `${path}.__codex_tmp_${randomUUID()}`;
+  try {
+    await writeFile(temporary, contents, { encoding: 'utf8', flag: 'wx' });
+    await rename(temporary, path);
+  } catch (error) {
+    await rm(temporary, { force: true }).catch(() => {});
+    throw error;
+  }
+}
+
+async function ensureDirectoryChain(assetsDir, directory) {
+  const relativeDirectory = relative(assetsDir, directory);
+  let current = assetsDir;
+  for (const part of relativeDirectory.split(sep).filter(Boolean)) {
+    current = join(current, part);
+    await mkdir(current, { recursive: true });
+    const metaPath = `${current}.meta`;
+    if (!(await exists(metaPath))) {
+      try {
+        await writeNewFileAtomically(metaPath, `${JSON.stringify(directoryMeta(), null, 2)}\n`);
+      } catch (error) {
+        if (error.code !== 'EEXIST') throw error;
+      }
+    }
+  }
+}
+
+async function replaceFilesTransaction(entries) {
+  const transaction = randomUUID();
+  const prepared = [];
+  const backups = [];
+  const installed = [];
+  try {
+    for (const entry of entries) {
+      const temporary = `${entry.path}.__codex_tmp_${transaction}`;
+      prepared.push({ ...entry, temporary });
+      await writeFile(temporary, entry.contents, { encoding: 'utf8', flag: 'wx' });
+    }
+    for (const entry of prepared) {
+      if (!(await exists(entry.path))) continue;
+      if (!entry.replace) {
+        const error = new Error(`asset already exists: ${entry.path} (use --force to replace it)`);
+        error.code = 'EEXIST';
+        throw error;
+      }
+      const backup = `${entry.path}.__codex_backup_${transaction}`;
+      await rename(entry.path, backup);
+      backups.push({ path: entry.path, backup });
+    }
+    for (const entry of prepared) {
+      await rename(entry.temporary, entry.path);
+      installed.push(entry.path);
+    }
+  } catch (error) {
+    const rollbackErrors = [];
+    for (const path of installed.reverse()) {
+      try { await rm(path, { force: true }); } catch (rollbackError) { rollbackErrors.push(rollbackError.message); }
+    }
+    for (const entry of backups.reverse()) {
+      try { await rename(entry.backup, entry.path); } catch (rollbackError) { rollbackErrors.push(rollbackError.message); }
+    }
+    for (const entry of prepared) await rm(entry.temporary, { force: true }).catch(() => {});
+    if (rollbackErrors.length) {
+      throw new Error(`${error.message}; rollback failed: ${rollbackErrors.join('; ')}`);
+    }
+    throw error;
+  }
+  await Promise.all(backups.map((entry) => rm(entry.backup, { force: true })));
+}
+
 const options = parseArgs(process.argv.slice(2));
 const [width, height] = numberPair(options.size, '--size', [100, 100]);
 const projectDir = resolve(options.project);
@@ -59,6 +138,9 @@ if (!/^3\.8(?:\.|$)/.test(creatorVersion)) {
 }
 
 const assetsDir = resolve(projectDir, 'assets');
+let assetsStat;
+try { assetsStat = await stat(assetsDir); } catch { usage(`assets directory not found: ${assetsDir}`); }
+if (!assetsStat.isDirectory()) usage(`assets path is not a directory: ${assetsDir}`);
 let assetPath = options.path.replaceAll('\\', '/');
 if (assetPath.startsWith('assets/')) assetPath = assetPath.slice('assets/'.length);
 if (extname(assetPath).toLowerCase() !== '.prefab') assetPath += '.prefab';
@@ -89,31 +171,43 @@ const prefab = [
   { __type__: 'cc.CompPrefabInfo', fileId: fileId() },
   { __type__: 'cc.PrefabInfo', root: { __id__: 1 }, asset: { __id__: 0 }, fileId: fileId(), instance: null, targetOverrides: null }
 ];
-const meta = {
-  ver: '1.1.50', importer: 'prefab', imported: true, uuid: randomUUID(), files: ['.json'], subMetas: {},
-  userData: { syncNodeName: name }
-};
-
-if (!options.force) {
-  for (const outputPath of [prefabPath, `${prefabPath}.meta`]) {
-    try {
-      await access(outputPath);
-      usage(`asset already exists: ${outputPath} (use --force to replace it)`);
-    } catch (error) {
-      if (error.code !== 'ENOENT') throw error;
-    }
-  }
+const metaPath = `${prefabPath}.meta`;
+const prefabExists = await exists(prefabPath);
+const metaExists = await exists(metaPath);
+if (!options.force && (prefabExists || metaExists)) {
+  usage(`asset already exists: ${prefabExists ? prefabPath : metaPath} (use --force to replace it)`);
+}
+if (options.force && prefabExists !== metaExists) {
+  usage(`cannot replace an incomplete asset pair; expected both ${prefabPath} and ${metaPath}`);
 }
 
-await mkdir(dirname(prefabPath), { recursive: true });
-const writeOptions = options.force ? { encoding: 'utf8' } : { encoding: 'utf8', flag: 'wx' };
+let meta;
+if (prefabExists) {
+  try { meta = JSON.parse(await readFile(metaPath, 'utf8')); }
+  catch { usage(`cannot preserve UUID from a valid Prefab meta file: ${metaPath}`); }
+  if (typeof meta.uuid !== 'string' || !meta.uuid) usage(`Prefab meta has no UUID to preserve: ${metaPath}`);
+  if (meta.importer !== 'prefab') usage(`expected prefab importer in ${metaPath}`);
+  meta.userData ??= {};
+  meta.userData.syncNodeName = name;
+} else {
+  meta = {
+    ver: '1.1.50', importer: 'prefab', imported: true, uuid: randomUUID(), files: ['.json'], subMetas: {},
+    userData: { syncNodeName: name }
+  };
+}
+
 try {
-  await writeFile(prefabPath, `${JSON.stringify(prefab, null, 2)}\n`, writeOptions);
-  await writeFile(`${prefabPath}.meta`, `${JSON.stringify(meta, null, 2)}\n`, writeOptions);
+  await ensureDirectoryChain(assetsDir, dirname(prefabPath));
+  await replaceFilesTransaction([
+    { path: prefabPath, contents: `${JSON.stringify(prefab, null, 2)}\n`, replace: options.force },
+    { path: metaPath, contents: `${JSON.stringify(meta, null, 2)}\n`, replace: options.force }
+  ]);
 } catch (error) {
-  if (error.code === 'EEXIST') usage(`asset already exists: ${prefabPath} (use --force to replace it)`);
+  if (error.code === 'EEXIST') {
+    usage(error.message);
+  }
   throw error;
 }
 
 console.log(prefabPath);
-console.log(`${prefabPath}.meta`);
+console.log(metaPath);

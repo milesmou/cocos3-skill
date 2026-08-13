@@ -20,7 +20,7 @@ description: 使用 Node.js 在 Cocos Creator 3.8 工程中离线创建空 UI Pr
    ```
 
    示例：`--path prefab/Prefab1.prefab --size 360,260`。`.prefab` 后缀可以省略，默认尺寸为 `100,100`。
-4. 默认不覆盖现有资源。只有用户明确要求替换时才使用 `--force`。
+4. 默认不覆盖现有资源。只有用户明确要求替换内容时才使用 `--force`；该参数保留现有 `.meta`、资源 UUID 和其他元数据，仅重建 Prefab 内容。
 5. 报告生成的两个文件。若 Creator 已打开，提醒用户刷新资源目录。
 
-脚本会创建兼容 Creator 3.8 的空 UI Prefab，其中包含一个根 `cc.Node`、一个 `cc.UITransform`、Prefab 关联记录和配套 `.prefab.meta` 文件。未特意指定 Layer 时，Prefab 根节点及后续创建的所有节点统一使用 `UI_2D`（`33554432`）。资源路径必须位于 `assets` 内。
+脚本会创建兼容 Creator 3.8 的空 UI Prefab，其中包含一个根 `cc.Node`、一个 `cc.UITransform`、Prefab 关联记录和配套 `.prefab.meta` 文件；新建父目录会同步生成目录 `.meta`。Prefab 与 `.meta` 使用事务式替换，失败时恢复旧文件。未特意指定 Layer 时，Prefab 根节点及后续创建的所有节点统一使用 `UI_2D`（`33554432`）。资源路径必须位于 `assets` 内。

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
-import { readFile, writeFile } from 'node:fs/promises';
+import { randomUUID } from 'node:crypto';
+import { access, readFile, rename, rm, writeFile } from 'node:fs/promises';
 import { extname, isAbsolute, relative, resolve, sep } from 'node:path';
 
 function usage(message) {
@@ -30,6 +31,48 @@ function parseArgs(argv) {
 function isWithin(parent, child) {
   const rel = relative(parent, child);
   return rel !== '..' && !rel.startsWith(`..${sep}`) && !isAbsolute(rel);
+}
+
+async function exists(path) {
+  try { await access(path); return true; } catch { return false; }
+}
+
+async function replaceFilesTransaction(entries) {
+  const transaction = randomUUID();
+  const prepared = [];
+  const backups = [];
+  const installed = [];
+  try {
+    for (const entry of entries) {
+      const temporary = `${entry.path}.__codex_tmp_${transaction}`;
+      prepared.push({ ...entry, temporary });
+      await writeFile(temporary, entry.contents, { encoding: 'utf8', flag: 'wx' });
+    }
+    for (const entry of prepared) {
+      if (!(await exists(entry.path))) throw new Error(`transaction target disappeared: ${entry.path}`);
+      const backup = `${entry.path}.__codex_backup_${transaction}`;
+      await rename(entry.path, backup);
+      backups.push({ path: entry.path, backup });
+    }
+    for (const entry of prepared) {
+      await rename(entry.temporary, entry.path);
+      installed.push(entry.path);
+    }
+  } catch (error) {
+    const rollbackErrors = [];
+    for (const path of installed.reverse()) {
+      try { await rm(path, { force: true }); } catch (rollbackError) { rollbackErrors.push(rollbackError.message); }
+    }
+    for (const entry of backups.reverse()) {
+      try { await rename(entry.backup, entry.path); } catch (rollbackError) { rollbackErrors.push(rollbackError.message); }
+    }
+    for (const entry of prepared) await rm(entry.temporary, { force: true }).catch(() => {});
+    if (rollbackErrors.length) {
+      throw new Error(`${error.message}; rollback failed: ${rollbackErrors.join('; ')}`);
+    }
+    throw error;
+  }
+  await Promise.all(backups.map((entry) => rm(entry.backup, { force: true })));
 }
 
 function childNodeIds(objects, node) {
@@ -99,8 +142,9 @@ try {
     meta.userData.syncNodeName = options.name;
   }
   if (!options.dryRun) {
-    await writeFile(prefabPath, `${JSON.stringify(objects, null, 2)}\n`, 'utf8');
-    if (isRoot) await writeFile(`${prefabPath}.meta`, `${JSON.stringify(meta, null, 2)}\n`, 'utf8');
+    const entries = [{ path: prefabPath, contents: `${JSON.stringify(objects, null, 2)}\n` }];
+    if (isRoot) entries.push({ path: `${prefabPath}.meta`, contents: `${JSON.stringify(meta, null, 2)}\n` });
+    await replaceFilesTransaction(entries);
   }
   console.log(`${options.dryRun ? 'Validated rename of' : 'Renamed'} ${oldName} -> ${options.name}${isRoot ? ' (root)' : ''}`);
 } catch (error) { usage(error.message); }

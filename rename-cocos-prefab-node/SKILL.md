@@ -27,4 +27,4 @@ description: 使用 Node.js 离线修改 Cocos Creator 3.8 Prefab 节点名称�
 4. 只有用户明确需要同级重名节点时才使用 `--allow-duplicate`。
 5. 验证节点路径与名称。修改根节点时，还要验证 `cc.Prefab._name` 和 `.prefab.meta` 中的 `userData.syncNodeName`。
 
-脚本只修改名称，不改变 Prefab 文件名、节点顺序、组件或对象引用。
+脚本只修改名称，不改变 Prefab 文件名、节点顺序、组件、对象引用或资源 UUID。修改根节点时，Prefab 与 `.meta` 使用事务式替换，失败时恢复旧文件。
