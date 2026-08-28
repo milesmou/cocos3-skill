@@ -1256,19 +1256,30 @@
             if (!open) {
                 resetAllNodePickingCycle();
                 setPickingMenuOpen(false);
+                selectedOutlineGeneration++;
+                clearSelectedOutlineBinding();
+                selectionOutline.removeAttribute('style');
+                selectionOutlineLabel.textContent = '';
+                selectedNodeId = 0;
             }
             panel.classList.toggle('is-open', open);
             document.body.classList.toggle('cocos-runtime-node-tree-open', open);
+            if (!open) {
+                renderTree();
+                renderDetails();
+            }
             edgeToggle.textContent = open ? '收起' : '节点树';
             edgeToggle.title = open ? '收起运行时节点树（Ctrl + `）' : '打开运行时节点树（Ctrl + `）';
             setPickingVisualState(open && getPickingMode() !== 'off');
             void setPreviewSelectionEnabled(open && getPickingMode() !== 'off').catch(error => {
                 summary.textContent = `点击定位监听失败：${error instanceof Error ? error.message : String(error)}`;
             });
-            void syncSelectedOutline().catch(error => {
-                selectionOutline.classList.remove('is-visible');
-                summary.textContent = `节点范围绘制失败：${error instanceof Error ? error.message : String(error)}`;
-            });
+            if (open) {
+                void syncSelectedOutline().catch(error => {
+                    selectionOutline.classList.remove('is-visible');
+                    summary.textContent = `节点范围绘制失败：${error instanceof Error ? error.message : String(error)}`;
+                });
+            }
             if (open && !nodeTreeSnapshot) void refreshTree();
         }
 
