@@ -327,10 +327,11 @@
         /** 上一次树渲染使用的搜索词，用于识别用户清空搜索的时机。 */
         let previousSearchQuery = '';
         const pickingControl = createElement('div', 'rnt-picking-control');
-        pickingControl.title = '交互节点：仅拾取响应指针事件的节点；所有节点：拾取鼠标位置下的 UITransform，重复点击同一位置可循环重叠节点';
+        pickingControl.title = '渲染节点：仅拾取自身带实际绘制组件的节点；交互节点：仅拾取响应指针事件的节点；所有节点：拾取鼠标位置下的 UITransform。渲染节点和所有节点模式下，重复点击同一位置可循环重叠节点';
         const pickingModeSelect = createElement('select', 'rnt-picking-mode');
         const pickingModeOptions = [
             { value: 'off', text: '关闭' },
+            { value: 'render', text: '渲染节点' },
             { value: 'interactive', text: '交互节点' },
             { value: 'all', text: '所有节点' }
         ];
@@ -363,7 +364,7 @@
             pickingModeCurrent.setAttribute('aria-expanded', String(open));
         }
 
-        /** 将隐藏的模式值同步到当前文字与三个自定义选项。 */
+        /** 将隐藏的模式值同步到当前文字与四个自定义选项。 */
         function syncPickingModeControl() {
             const selectedOption = pickingModeOptions.find(option => option.value === pickingModeSelect.value);
             pickingModeCurrent.textContent = selectedOption?.text ?? '';
@@ -455,13 +456,15 @@
             return panel.classList.contains('is-open') && getPickingMode() !== 'off';
         }
 
-        /** 在“所有节点”模式下阻止游戏输入，并在指针抬起时执行全节点命中检测。 */
+        /** 在“渲染节点”或“所有节点”模式下阻止游戏输入，并在指针抬起时执行节点命中检测。 */
         function onAllNodePickingPointerEvent(event) {
-            if (!panel.classList.contains('is-open') || getPickingMode() !== 'all') return;
+            const pickingMode = getPickingMode();
+            if (!panel.classList.contains('is-open')
+                || (pickingMode !== 'render' && pickingMode !== 'all')) return;
             event.preventDefault();
             event.stopImmediatePropagation();
             if (event.type === 'pointerup') {
-                void selectAllPreviewNodeAt(event.clientX, event.clientY).catch(error => {
+                void selectAllPreviewNodeAt(event.clientX, event.clientY, pickingMode).catch(error => {
                     summary.textContent = `节点拾取失败：${error instanceof Error ? error.message : String(error)}`;
                 });
             }
@@ -511,11 +514,29 @@
             });
         }
 
-        /** 在鼠标位置下检测全部有效 UITransform，并拾取相机优先级和绘制顺序最靠前的节点。 */
-        async function selectAllPreviewNodeAt(clientX, clientY) {
-            if (!gameCanvas || !panel.classList.contains('is-open') || getPickingMode() !== 'all') return;
+        /** 判断节点自身是否包含会生成实际绘制数据的渲染组件。 */
+        function hasDrawableRenderer(cc, node) {
+            const components = node.components;
+            for (let i = 0; i < components.length; i++) {
+                const component = components[i];
+                if (!(component instanceof cc.Renderer)) continue;
+                if (component instanceof cc.UIRenderer
+                    && !component.renderData
+                    && !component._assembler
+                    && !component._postAssembler) continue;
+                return true;
+            }
+            return false;
+        }
+
+        /** 在鼠标位置下检测有效 UITransform，并按当前模式过滤后拾取最靠前的节点。 */
+        async function selectAllPreviewNodeAt(clientX, clientY, pickingMode) {
+            if (!gameCanvas
+                || !panel.classList.contains('is-open')
+                || (pickingMode !== 'render' && pickingMode !== 'all')
+                || getPickingMode() !== pickingMode) return;
             const cc = await globalThis.System.import('cc');
-            if (!panel.classList.contains('is-open') || getPickingMode() !== 'all') return;
+            if (!panel.classList.contains('is-open') || getPickingMode() !== pickingMode) return;
             const scene = cc.director.getScene();
             const canvasRect = gameCanvas.getBoundingClientRect();
             if (!scene || canvasRect.width <= 0 || canvasRect.height <= 0) return;
@@ -547,6 +568,7 @@
             for (let i = nodes.length - 1; i >= 0; i--) {
                 const node = nodes[i];
                 if (!node.activeInHierarchy) continue;
+                if (pickingMode === 'render' && !hasDrawableRenderer(cc, node)) continue;
                 const uiTransform = node.getComponent(cc.UITransform);
                 if (!uiTransform?.enabledInHierarchy || !uiTransform.hitTest(screenPoint, 0)) continue;
                 hitCandidates.push({
