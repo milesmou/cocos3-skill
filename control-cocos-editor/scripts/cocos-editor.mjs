@@ -10,10 +10,14 @@ function usage(message) {
     '  node cocos-editor.mjs --project <dir> status',
     '  node cocos-editor.mjs --project <dir> [--timeout <ms>] [--poll <ms>] wait <ready|idle>',
     '  node cocos-editor.mjs --project <dir> [--width <px>] [--height <px>] preview <prefab-url-or-uuid> <output.png>',
+    '  node cocos-editor.mjs --project <dir> runtime-stats [options-json]',
     '  node cocos-editor.mjs --project <dir> request <scene|asset-db|scene-script> <method> [args-json]',
     '',
     'args-json must be a JSON array. Example:',
-    '  node cocos-editor.mjs --project . request scene query-node \'["node-uuid"]\''
+    '  node cocos-editor.mjs --project . request scene query-node \'["node-uuid"]\'',
+    '',
+    'runtime-stats options-json is a JSON object. Example:',
+    '  node cocos-editor.mjs --project . runtime-stats \'{"root":"Scene/Canvas","topComponents":20}\''
   ].join('\n'));
   process.exit(message ? 1 : 0);
 }
@@ -114,15 +118,26 @@ try {
         height: options.height
       }]
     }, options.timeout);
+  } else if (options.command === 'runtime-stats') {
+    let runtimeOptions;
+    try { runtimeOptions = JSON.parse(options.target || '{}'); } catch { usage('runtime-stats options-json must be valid JSON'); }
+    if (!runtimeOptions || Array.isArray(runtimeOptions) || typeof runtimeOptions !== 'object') {
+      usage('runtime-stats options-json must be a JSON object');
+    }
+    result = await requestBridge(info, {
+      target: 'bridge',
+      method: 'runtime-node-stats',
+      args: [runtimeOptions]
+    }, options.timeout);
   } else if (options.command === 'request') {
-    if (!['scene', 'asset-db', 'scene-script'].includes(options.target)) usage('invalid request target');
+    if (!['bridge', 'scene', 'asset-db', 'scene-script'].includes(options.target)) usage('invalid request target');
     if (!options.method) usage('request method is required');
     let args;
     try { args = JSON.parse(options.argsJson); } catch { usage('args-json must be valid JSON'); }
     if (!Array.isArray(args)) usage('args-json must be a JSON array');
     result = await requestBridge(info, { target: options.target, method: options.method, args }, options.timeout);
   } else {
-    usage('command must be status, wait, preview, or request');
+    usage('command must be status, wait, preview, runtime-stats, or request');
   }
   console.log(JSON.stringify(result, null, 2));
 } catch (error) {

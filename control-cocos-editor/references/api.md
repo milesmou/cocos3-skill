@@ -2,6 +2,13 @@
 
 Use `node control-cocos-editor/scripts/cocos-editor.mjs --project <project> request <target> <method> '<args-array>'`.
 
+Request one runtime node-count snapshot from every connected normal Web preview instance:
+
+```powershell
+node control-cocos-editor/scripts/cocos-editor.mjs --project <project> runtime-stats
+node control-cocos-editor/scripts/cocos-editor.mjs --project <project> runtime-stats '{"root":"Scene/Canvas","topComponents":20}'
+```
+
 Export a Prefab through Creator 3.8.5-3.8.x's internal WebGL renderer:
 
 ```powershell
@@ -15,6 +22,7 @@ The output must be a `.png` inside the target project. This opens a temporary si
 - `scene`: forwards an allowlisted public Creator 3.8 Scene message.
 - `asset-db`: forwards an allowlisted Creator 3.8 AssetDB message.
 - `scene-script`: calls a method in the bundled scene script.
+- `bridge`: calls an allowlisted bridge method such as `status` or `runtime-node-stats`.
 
 ## Scene messages
 

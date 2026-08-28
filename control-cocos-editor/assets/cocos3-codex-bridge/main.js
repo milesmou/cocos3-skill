@@ -10,6 +10,8 @@ const HOST = '127.0.0.1';
 const MAX_BODY_BYTES = 2 * 1024 * 1024;
 const CONNECTION_FILE = 'cocos3-codex-bridge.json';
 const PREVIEW_PANEL = `${packageJSON.name}.preview`;
+/** 等待普通 Web 预览返回一次节点快照的最长时间，单位毫秒。 */
+const RUNTIME_REQUEST_TIMEOUT_MS = 5000;
 const ALLOWED_MESSAGES = {
   scene: new Set([
     'open-scene', 'save-scene', 'save-as-scene', 'close-scene',
@@ -36,6 +38,14 @@ const ALLOWED_MESSAGES = {
 let server = null;
 let token = '';
 let connectionPath = '';
+/** 接收普通 Web 预览连接的本机只读中继服务。 */
+let runtimeServer = null;
+/** 中继当前监听端口；0 表示不可用。 */
+let runtimePort = 0;
+/** 已连接的普通 Web 预览实例，键为实例 ID。 */
+const runtimeClients = new Map();
+/** 等待预览返回的节点快照请求，键为随机请求 ID。 */
+const runtimeRequests = new Map();
 
 function projectPath() {
   return Editor.Project.path;
@@ -112,6 +122,161 @@ async function readBody(request) {
   return JSON.parse(Buffer.concat(chunks).toString('utf8') || '{}');
 }
 
+/** 读取运行时中继的 UTF-8 文本请求体，并限制最大字节数。 */
+async function readTextBody(request) {
+  const chunks = [];
+  let size = 0;
+  for await (const chunk of request) {
+    size += chunk.length;
+    if (size > MAX_BODY_BYTES) throw new Error('request body exceeds 2 MiB');
+    chunks.push(chunk);
+  }
+  return Buffer.concat(chunks).toString('utf8');
+}
+
+/** 返回项目配置的 Creator Web 预览端口。 */
+function configuredPreviewPort() {
+  const profile = path.join(projectPath(), 'profiles', 'v2', 'packages', 'server.json');
+  try {
+    const value = JSON.parse(fs.readFileSync(profile, 'utf8'))?.server_port;
+    if (Number.isInteger(value) && value > 0 && value < 65535) return value;
+  } catch {
+    // Creator defaults to 7456 when the project profile is absent or incomplete.
+  }
+  return 7456;
+}
+
+/** 仅允许同项目本机 Web 预览页面访问运行时中继。 */
+function isAllowedRuntimeOrigin(request) {
+  const origin = request.headers.origin;
+  if (!origin || origin === 'null') return true;
+  try {
+    const url = new URL(origin);
+    return (url.hostname === '127.0.0.1' || url.hostname === 'localhost')
+      && Number(url.port || (url.protocol === 'https:' ? 443 : 80)) === configuredPreviewPort();
+  } catch {
+    return false;
+  }
+}
+
+/** 创建运行时中继响应所需的本机跨端口响应头。 */
+function runtimeHeaders(contentType) {
+  return {
+    'access-control-allow-origin': '*',
+    'cache-control': 'no-store',
+    'content-type': contentType
+  };
+}
+
+/** 向普通 Web 预览写入 JSON 中继响应。 */
+function writeRuntimeJson(response, status, payload) {
+  const body = JSON.stringify(payload);
+  response.writeHead(status, {
+    ...runtimeHeaders('application/json; charset=utf-8'),
+    'content-length': Buffer.byteLength(body)
+  });
+  response.end(body);
+}
+
+/** 完成节点快照请求，并保留多预览实例的部分超时信息。 */
+function finishRuntimeRequest(requestId, timedOut = false) {
+  const pending = runtimeRequests.get(requestId);
+  if (!pending) return;
+  runtimeRequests.delete(requestId);
+  clearTimeout(pending.timer);
+  pending.resolve({
+    runtimePort,
+    instanceCount: pending.results.length,
+    timedOut,
+    missingInstances: [...pending.expected],
+    snapshots: pending.results
+  });
+}
+
+/** 处理普通 Web 预览的事件流连接和快照回传。 */
+async function handleRuntimeRequest(request, response) {
+  if (!isAllowedRuntimeOrigin(request)) {
+    writeRuntimeJson(response, 403, { ok: false, error: 'runtime origin is not allowed' });
+    return;
+  }
+  const requestUrl = new URL(request.url, `http://${HOST}:${runtimePort}`);
+  if (request.method === 'GET' && requestUrl.pathname === '/runtime/events') {
+    const instanceId = String(requestUrl.searchParams.get('instance') || '');
+    if (!/^[a-zA-Z0-9_-]{8,80}$/.test(instanceId)) {
+      writeRuntimeJson(response, 400, { ok: false, error: 'invalid runtime instance id' });
+      return;
+    }
+    const previous = runtimeClients.get(instanceId);
+    if (previous && previous !== response && !previous.writableEnded) previous.end();
+    response.writeHead(200, {
+      ...runtimeHeaders('text/event-stream; charset=utf-8'),
+      connection: 'keep-alive'
+    });
+    response.write('retry: 1000\n\n');
+    runtimeClients.set(instanceId, response);
+    request.on('close', () => {
+      if (runtimeClients.get(instanceId) === response) runtimeClients.delete(instanceId);
+    });
+    return;
+  }
+  if (request.method === 'POST' && requestUrl.pathname === '/runtime/result') {
+    const requestId = String(requestUrl.searchParams.get('request') || '');
+    const instanceId = String(requestUrl.searchParams.get('instance') || '');
+    const pending = runtimeRequests.get(requestId);
+    if (!pending || !pending.expected.has(instanceId)) {
+      writeRuntimeJson(response, 404, { ok: false, error: 'runtime request not found' });
+      return;
+    }
+    const payload = JSON.parse(await readTextBody(request) || '{}');
+    pending.expected.delete(instanceId);
+    pending.results.push(payload);
+    writeRuntimeJson(response, 200, { ok: true });
+    if (pending.expected.size === 0) finishRuntimeRequest(requestId);
+    return;
+  }
+  writeRuntimeJson(response, 404, { ok: false, error: 'runtime endpoint not found' });
+}
+
+/** 请求所有已连接普通 Web 预览各返回一次节点统计快照。 */
+function requestRuntimeNodeStats(options = {}) {
+  const clients = [...runtimeClients.entries()].filter(([, response]) => !response.writableEnded);
+  if (clients.length === 0) {
+    throw new Error('no runtime inspector is connected; run or refresh the normal Creator Web preview after installing preview-template');
+  }
+  const requestId = crypto.randomBytes(16).toString('hex');
+  return new Promise((resolve, reject) => {
+    const expected = new Set(clients.map(([instanceId]) => instanceId));
+    const pending = {
+      expected,
+      results: [],
+      resolve,
+      reject,
+      timer: setTimeout(() => {
+        if (pending.results.length > 0) finishRuntimeRequest(requestId, true);
+        else {
+          runtimeRequests.delete(requestId);
+          reject(new Error(`runtime node stats timed out after ${RUNTIME_REQUEST_TIMEOUT_MS} ms`));
+        }
+      }, RUNTIME_REQUEST_TIMEOUT_MS)
+    };
+    runtimeRequests.set(requestId, pending);
+    const event = `data: ${JSON.stringify({ requestId, type: 'node-stats', options })}\n\n`;
+    for (const [instanceId, response] of clients) {
+      try {
+        response.write(event);
+      } catch {
+        expected.delete(instanceId);
+        runtimeClients.delete(instanceId);
+      }
+    }
+    if (expected.size === 0) {
+      runtimeRequests.delete(requestId);
+      clearTimeout(pending.timer);
+      reject(new Error('all runtime inspector connections closed before the request was sent'));
+    }
+  });
+}
+
 async function dispatch(payload) {
   const args = Array.isArray(payload.args) ? payload.args : [];
   if (payload.target === 'bridge') {
@@ -124,10 +289,15 @@ async function dispatch(payload) {
         project: projectPath(),
         sceneReady: await Editor.Message.request('scene', 'query-is-ready'),
         assetDbReady: await Editor.Message.request('asset-db', 'query-ready'),
-        prefabPreviewPng: /^3\.8\.(?:[5-9]|\d{2,})/.test(String(Editor.App.version || ''))
+        prefabPreviewPng: /^3\.8\.(?:[5-9]|\d{2,})/.test(String(Editor.App.version || '')),
+        runtimeInspector: {
+          port: runtimePort || null,
+          connectedInstances: runtimeClients.size
+        }
       };
     }
     if (payload.method === 'export-prefab-preview') return exportPrefabPreview(args[0]);
+    if (payload.method === 'runtime-node-stats') return requestRuntimeNodeStats(args[0]);
     throw new Error(`unsupported bridge method: ${payload.method}`);
   }
   if (payload.target === 'scene-script') {
@@ -202,6 +372,27 @@ function startServer() {
   });
 }
 
+/** 在预览端口后一端口启动本机运行时状态中继。 */
+function startRuntimeServer() {
+  runtimePort = configuredPreviewPort() + 1;
+  runtimeServer = http.createServer((request, response) => {
+    void handleRuntimeRequest(request, response).catch((error) => {
+      if (!response.headersSent) {
+        writeRuntimeJson(response, 400, { ok: false, error: error instanceof Error ? error.message : String(error) });
+      } else {
+        response.end();
+      }
+    });
+  });
+  runtimeServer.on('error', (error) => {
+    console.error(`[${packageJSON.name}] runtime inspector unavailable on ${HOST}:${runtimePort}: ${error.message}`);
+    runtimePort = 0;
+  });
+  runtimeServer.listen(runtimePort, HOST, () => {
+    console.log(`[${packageJSON.name}] runtime inspector listening on ${HOST}:${runtimePort}`);
+  });
+}
+
 exports.methods = {
   bridgeStatus() {
     return { running: Boolean(server?.listening), connectionPath };
@@ -210,6 +401,7 @@ exports.methods = {
 
 exports.load = function load() {
   startServer();
+  startRuntimeServer();
 };
 
 exports.unload = function unload() {
@@ -218,4 +410,16 @@ exports.unload = function unload() {
     server.close();
     server = null;
   }
+  for (const response of runtimeClients.values()) response.end();
+  runtimeClients.clear();
+  for (const [requestId, pending] of runtimeRequests) {
+    clearTimeout(pending.timer);
+    pending.reject(new Error('runtime inspector stopped'));
+    runtimeRequests.delete(requestId);
+  }
+  if (runtimeServer) {
+    runtimeServer.close();
+    runtimeServer = null;
+  }
+  runtimePort = 0;
 };

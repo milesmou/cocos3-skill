@@ -1,6 +1,6 @@
 ---
 name: control-cocos-editor
-description: 安装并使用本地认证桥接扩展，通过 Cocos Creator 3.8 官方 Scene、AssetDB 消息和 Scene Script API 控制编辑器。适用于连接编辑器、执行原子查询或修改、保存内容、等待资源导入，以及为其他 Cocos 管理技能提供公共通信底座。
+description: 安装并使用本地认证桥接扩展，通过 Cocos Creator 3.8 官方 Scene、AssetDB 消息和 Scene Script API 控制编辑器，并按需读取普通 Web 预览当前实例的运行时节点统计。适用于连接编辑器、查询或修改编辑内容、保存、等待资源导入和检查运行时节点数量状态。
 ---
 
 # 控制 Cocos Creator 编辑器
@@ -52,6 +52,10 @@ node scripts/cocos-editor.mjs --project <工程目录> request scene-script insp
 ```
 
 完整方法和参数见 [references/api.md](references/api.md)。
+
+## 运行时节点统计
+
+需要查看开发人员当前正常运行的 Web 预览节点数量、激活状态或组件数量时，先读取并遵循 [references/runtime-node-stats.md](references/runtime-node-stats.md)。该功能只在收到命令时遍历一次节点树，不持续采样。
 
 ## 导出 Prefab PNG
 

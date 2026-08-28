@@ -42,6 +42,10 @@
 
 通过 AssetDB 创建 TypeScript 组件脚本，等待导入并确认组件注册。
 
+### create-special-cook-machine
+
+为章节特殊烹饪设备编写 `cookMachine` 子类（`Level_X/scripts`）、对接补货/制作钩子与 `machineShow`，并挂到设备 Prefab。通用组件仍用 `create-cocos-component-script`。
+
 ### manage-cocos-event-handlers
 
 配置 Button、Toggle、ScrollView 等组件的 Inspector 事件回调。
@@ -102,6 +106,7 @@ cocos-skill/
 ├── manage-cocos-assets/
 ├── validate-cocos-content/
 ├── create-cocos-component-script/
+├── create-special-cook-machine/
 ├── manage-cocos-event-handlers/
 ├── manage-cocos-animation/
 ├── plan-cocos-prefab-tree/

@@ -1,0 +1,4 @@
+interface:
+  display_name: "创建特殊烹饪设备脚本"
+  short_description: "编写 cookMachine 章节专用子类并挂到设备 Prefab"
+  default_prompt: "Use $create-special-cook-machine to create a Level_X special cookMachine subclass."

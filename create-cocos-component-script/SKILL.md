@@ -1,11 +1,13 @@
 ---
 name: create-cocos-component-script
-description: 通过 Cocos Creator 3.8 AssetDB 创建 TypeScript 组件脚本、等待导入编译、确认 ccclass 注册名并挂载到节点。适用于新增项目组件脚本和声明可在 Inspector 中绑定的属性。
+description: 通过 Cocos Creator 3.8 AssetDB 创建 TypeScript 组件脚本、等待导入编译、确认 ccclass 注册名并挂载到节点。适用于新增项目组件脚本和声明可在 Inspector 中绑定的属性。若任务是章节特殊烹饪设备（继承 cookMachine、Level_X/scripts），改用 create-special-cook-machine。
 ---
 
 # 创建 Cocos 组件脚本
 
 遵循项目根 `AGENTS.md` 的 TypeScript、性能、资源和日志规范。不要生成 JSB、Native 或 C++ 绑定。
+
+若需求是战斗烹饪设施的章节专用逻辑（特殊设备 / `cookMachine` 子类 / `Level_X/scripts`），停止本流程，改读并遵循 `create-special-cook-machine/SKILL.md`。
 
 ## 工作流
 
