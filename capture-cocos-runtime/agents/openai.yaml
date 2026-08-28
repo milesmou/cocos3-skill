@@ -1,0 +1,4 @@
+interface:
+  display_name: "Cocos 运行时截图"
+  short_description: "捕捉当前 Cocos Web 预览的真实运行画面"
+  default_prompt: "Use $capture-cocos-runtime to capture the current Cocos Web preview as a PNG."

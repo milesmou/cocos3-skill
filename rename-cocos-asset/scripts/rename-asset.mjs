@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
-import { randomUUID } from 'node:crypto';
-import { access, readFile, rename, stat } from 'node:fs/promises';
+import { access, mkdir, mkdtemp, readFile, rename, rmdir, stat } from 'node:fs/promises';
 import { basename, dirname, extname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 
 function usage(message) {
@@ -61,21 +60,33 @@ try {
   if (!caseOnly && await exists(`${destination}.meta`)) throw new Error(`destination meta already exists: ${destination}.meta`);
 
   if (!options.dryRun) {
-    const temporary = caseOnly ? join(dirname(source), `.__codex_rename_${randomUUID()}`) : destination;
-    await rename(source, temporary);
-    try { await rename(`${source}.meta`, `${temporary}.meta`); }
-    catch (error) {
-      try { await rename(temporary, source); } catch {}
-      throw error;
-    }
-    if (caseOnly) {
-      try {
-        await rename(temporary, destination);
-        await rename(`${temporary}.meta`, `${destination}.meta`);
-      } catch (error) {
-        try { if (await exists(destination)) await rename(destination, source); } catch {}
-        try { if (await exists(`${temporary}.meta`)) await rename(`${temporary}.meta`, `${source}.meta`); } catch {}
+    let temporaryDirectory = '';
+    try {
+      if (caseOnly) {
+        const temporaryRoot = resolve(projectDir, 'temp', 'rename-cocos-asset');
+        await mkdir(temporaryRoot, { recursive: true });
+        temporaryDirectory = await mkdtemp(join(temporaryRoot, 'operation-'));
+      }
+      const temporary = caseOnly ? join(temporaryDirectory, basename(source)) : destination;
+      await rename(source, temporary);
+      try { await rename(`${source}.meta`, `${temporary}.meta`); }
+      catch (error) {
+        try { await rename(temporary, source); } catch {}
         throw error;
+      }
+      if (caseOnly) {
+        try {
+          await rename(temporary, destination);
+          await rename(`${temporary}.meta`, `${destination}.meta`);
+        } catch (error) {
+          try { if (await exists(destination)) await rename(destination, source); } catch {}
+          try { if (await exists(`${temporary}.meta`)) await rename(`${temporary}.meta`, `${source}.meta`); } catch {}
+          throw error;
+        }
+      }
+    } finally {
+      if (temporaryDirectory) {
+        try { await rmdir(temporaryDirectory); } catch {}
       }
     }
   }

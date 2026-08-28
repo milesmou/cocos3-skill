@@ -125,3 +125,46 @@ test('editor CLI requests internal Prefab PNG export', async () => {
     await rm(project, { recursive: true, force: true });
   }
 });
+
+test('editor CLI requests current runtime GameCanvas PNG export', async () => {
+  const project = await mkdtemp(join(tmpdir(), 'cocos-cli-runtime-screenshot-test-'));
+  let received;
+  const server = createServer(async (request, response) => {
+    const chunks = [];
+    for await (const chunk of request) chunks.push(chunk);
+    received = JSON.parse(Buffer.concat(chunks).toString('utf8'));
+    response.writeHead(200, { 'content-type': 'application/json' });
+    response.end(JSON.stringify({
+      ok: true,
+      result: {
+        renderer: 'runtime:GameCanvas',
+        output: 'D:/project/temp/runtime.png',
+        width: 750,
+        height: 1334,
+        bytes: 2048
+      }
+    }));
+  });
+  try {
+    await new Promise((resolveListen) => server.listen(0, '127.0.0.1', resolveListen));
+    const address = server.address();
+    await mkdir(join(project, 'temp'));
+    await writeFile(join(project, 'temp', 'cocos3-codex-bridge.json'), JSON.stringify({
+      schema: 1,
+      host: '127.0.0.1',
+      port: address.port,
+      token: 'test-token'
+    }));
+
+    const { stdout } = await execFileAsync(process.execPath, [
+      cli, '--project', project, 'runtime-screenshot', 'temp/runtime.png'
+    ]);
+    assert.equal(JSON.parse(stdout).renderer, 'runtime:GameCanvas');
+    assert.equal(received.target, 'bridge');
+    assert.equal(received.method, 'export-runtime-screenshot');
+    assert.deepEqual(received.args, [{ output: 'temp/runtime.png' }]);
+  } finally {
+    await new Promise((resolveClose) => server.close(resolveClose));
+    await rm(project, { recursive: true, force: true });
+  }
+});

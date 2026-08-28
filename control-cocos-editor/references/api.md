@@ -12,10 +12,10 @@ node control-cocos-editor/scripts/cocos-editor.mjs --project <project> runtime-s
 Export a Prefab through Creator 3.8.5-3.8.x's internal WebGL renderer:
 
 ```powershell
-node control-cocos-editor/scripts/cocos-editor.mjs --project <project> --timeout 60000 --width 1024 --height 768 preview db://assets/ui/example.prefab temp/previews/example.png
+node control-cocos-editor/scripts/cocos-editor.mjs --project <project> --timeout 60000 --width 1024 --height 768 preview db://assets/ui/example.prefab temp/cocos-prefab-preview/example.png
 ```
 
-The output must be a `.png` inside the target project. This opens a temporary simple panel, calls the internal `scene:prefab-preview` renderer, switches and verifies `is2DView`, captures its WebGL canvas, and closes the panel if the bridge opened it. A successful result includes `"previewMode": "2D"`.
+The output must be a `.png` inside the target project's `temp/` directory. The bridge rejects paths elsewhere. This opens a temporary simple panel, calls the internal `scene:prefab-preview` renderer, switches and verifies `is2DView`, captures its WebGL canvas, and closes the panel if the bridge opened it. A successful result includes `"previewMode": "2D"`.
 
 ## Targets
 

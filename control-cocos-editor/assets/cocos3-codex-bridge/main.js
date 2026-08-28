@@ -8,10 +8,14 @@ const packageJSON = require('./package.json');
 
 const HOST = '127.0.0.1';
 const MAX_BODY_BYTES = 2 * 1024 * 1024;
+/** 运行时截图以 Base64 JSON 回传时允许的最大请求体，单位字节。 */
+const MAX_RUNTIME_BODY_BYTES = 32 * 1024 * 1024;
 const CONNECTION_FILE = 'cocos3-codex-bridge.json';
 const PREVIEW_PANEL = `${packageJSON.name}.preview`;
 /** 等待普通 Web 预览返回一次节点快照的最长时间，单位毫秒。 */
 const RUNTIME_REQUEST_TIMEOUT_MS = 5000;
+/** 等待普通 Web 预览完成一帧绘制并编码 PNG 的最长时间，单位毫秒。 */
+const RUNTIME_SCREENSHOT_TIMEOUT_MS = 10000;
 const ALLOWED_MESSAGES = {
   scene: new Set([
     'open-scene', 'save-scene', 'save-as-scene', 'close-scene',
@@ -56,6 +60,16 @@ function isWithin(parent, child) {
   return value !== '..' && !value.startsWith(`..${path.sep}`) && !path.isAbsolute(value);
 }
 
+/** 将一次性输出限制在工程 temp 目录，避免调试资源散落到工程其他位置。 */
+function resolveTemporaryOutput(output, label) {
+  const tempDirectory = path.resolve(projectPath(), 'temp');
+  const resolved = path.resolve(projectPath(), output);
+  if (!isWithin(tempDirectory, resolved) || resolved === tempDirectory) {
+    throw new Error(`${label} must stay inside the project temp directory`);
+  }
+  return resolved;
+}
+
 function requirePrefabPreviewVersion() {
   const match = String(Editor.App.version || '').match(/^3\.8\.(\d+)/);
   if (!match || Number(match[1]) < 5) {
@@ -79,8 +93,7 @@ async function exportPrefabPreview(options = {}) {
     throw new Error(`asset is not a Prefab: ${info.url || options.asset}`);
   }
 
-  const output = path.resolve(projectPath(), options.output);
-  if (!isWithin(projectPath(), output)) throw new Error('preview output must stay inside the project');
+  const output = resolveTemporaryOutput(options.output, 'preview output');
   if (path.extname(output).toLowerCase() !== '.png') throw new Error('preview output must use the .png extension');
 
   const wasOpen = await Editor.Panel.has(PREVIEW_PANEL);
@@ -123,12 +136,12 @@ async function readBody(request) {
 }
 
 /** 读取运行时中继的 UTF-8 文本请求体，并限制最大字节数。 */
-async function readTextBody(request) {
+async function readTextBody(request, maxBytes = MAX_BODY_BYTES) {
   const chunks = [];
   let size = 0;
   for await (const chunk of request) {
     size += chunk.length;
-    if (size > MAX_BODY_BYTES) throw new Error('request body exceeds 2 MiB');
+    if (size > maxBytes) throw new Error(`request body exceeds ${Math.floor(maxBytes / 1024 / 1024)} MiB`);
     chunks.push(chunk);
   }
   return Buffer.concat(chunks).toString('utf8');
@@ -227,7 +240,7 @@ async function handleRuntimeRequest(request, response) {
       writeRuntimeJson(response, 404, { ok: false, error: 'runtime request not found' });
       return;
     }
-    const payload = JSON.parse(await readTextBody(request) || '{}');
+    const payload = JSON.parse(await readTextBody(request, MAX_RUNTIME_BODY_BYTES) || '{}');
     pending.expected.delete(instanceId);
     pending.results.push(payload);
     writeRuntimeJson(response, 200, { ok: true });
@@ -277,6 +290,68 @@ function requestRuntimeNodeStats(options = {}) {
   });
 }
 
+/** 请求唯一连接的普通 Web 预览捕捉当前 GameCanvas，并将 PNG 写入工程 temp 目录。 */
+async function exportRuntimeScreenshot(options = {}) {
+  if (typeof options.output !== 'string' || !options.output) throw new Error('runtime screenshot output PNG path is required');
+  const output = resolveTemporaryOutput(options.output, 'runtime screenshot output');
+  if (path.extname(output).toLowerCase() !== '.png') throw new Error('runtime screenshot output must use the .png extension');
+
+  const clients = [...runtimeClients.entries()].filter(([, response]) => !response.writableEnded);
+  if (clients.length === 0) {
+    throw new Error('no runtime inspector is connected; run or refresh the normal Creator Web preview after installing preview-template');
+  }
+  if (clients.length !== 1) {
+    throw new Error(`runtime screenshot requires exactly one connected preview instance; found ${clients.length}`);
+  }
+
+  const requestId = crypto.randomBytes(16).toString('hex');
+  const runtimeResult = await new Promise((resolve, reject) => {
+    const expected = new Set([clients[0][0]]);
+    const pending = {
+      expected,
+      results: [],
+      resolve,
+      reject,
+      timer: setTimeout(() => {
+        runtimeRequests.delete(requestId);
+        reject(new Error(`runtime screenshot timed out after ${RUNTIME_SCREENSHOT_TIMEOUT_MS} ms`));
+      }, RUNTIME_SCREENSHOT_TIMEOUT_MS)
+    };
+    runtimeRequests.set(requestId, pending);
+    try {
+      clients[0][1].write(`data: ${JSON.stringify({ requestId, type: 'runtime-screenshot' })}\n\n`);
+    } catch {
+      runtimeRequests.delete(requestId);
+      clearTimeout(pending.timer);
+      runtimeClients.delete(clients[0][0]);
+      reject(new Error('runtime inspector connection closed before the screenshot request was sent'));
+    }
+  });
+
+  const payload = runtimeResult.snapshots[0];
+  if (payload?.error) throw new Error(`runtime screenshot failed: ${payload.error}`);
+  if (typeof payload?.pngBase64 !== 'string' || !payload.pngBase64) {
+    throw new Error('runtime screenshot returned no PNG data');
+  }
+  const png = Buffer.from(payload.pngBase64, 'base64');
+  const pngSignature = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
+  if (png.length < pngSignature.length || !png.subarray(0, pngSignature.length).equals(pngSignature)) {
+    throw new Error('runtime screenshot returned invalid PNG data');
+  }
+  fs.mkdirSync(path.dirname(output), { recursive: true });
+  fs.writeFileSync(output, png);
+  return {
+    renderer: 'runtime:GameCanvas',
+    output,
+    bytes: png.length,
+    width: payload.width,
+    height: payload.height,
+    instanceId: payload.instanceId,
+    capturedAt: payload.capturedAt,
+    page: payload.page
+  };
+}
+
 async function dispatch(payload) {
   const args = Array.isArray(payload.args) ? payload.args : [];
   if (payload.target === 'bridge') {
@@ -292,12 +367,14 @@ async function dispatch(payload) {
         prefabPreviewPng: /^3\.8\.(?:[5-9]|\d{2,})/.test(String(Editor.App.version || '')),
         runtimeInspector: {
           port: runtimePort || null,
-          connectedInstances: runtimeClients.size
+          connectedInstances: runtimeClients.size,
+          screenshotPng: true
         }
       };
     }
     if (payload.method === 'export-prefab-preview') return exportPrefabPreview(args[0]);
     if (payload.method === 'runtime-node-stats') return requestRuntimeNodeStats(args[0]);
+    if (payload.method === 'export-runtime-screenshot') return exportRuntimeScreenshot(args[0]);
     throw new Error(`unsupported bridge method: ${payload.method}`);
   }
   if (payload.target === 'scene-script') {

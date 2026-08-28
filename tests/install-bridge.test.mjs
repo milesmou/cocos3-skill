@@ -8,6 +8,7 @@ import test from 'node:test';
 
 const execFileAsync = promisify(execFile);
 const installer = resolve('control-cocos-editor/scripts/install-bridge.mjs');
+const sourcePackage = resolve('control-cocos-editor/assets/cocos3-codex-bridge/package.json');
 
 test('bridge installer installs and removes the extension in a Creator 3.8 project', async () => {
   const project = await mkdtemp(join(tmpdir(), 'cocos-bridge-test-'));
@@ -17,8 +18,9 @@ test('bridge installer installs and removes the extension in a Creator 3.8 proje
 
     const installedPackage = join(project, 'extensions', 'cocos3-codex-bridge', 'package.json');
     const manifest = JSON.parse(await readFile(installedPackage, 'utf8'));
+    const sourceManifest = JSON.parse(await readFile(sourcePackage, 'utf8'));
     assert.equal(manifest.name, 'cocos3-codex-bridge');
-    assert.equal(manifest.version, '1.2.2');
+    assert.equal(manifest.version, sourceManifest.version);
     assert.equal(manifest.panels.preview.main, './preview.js');
     const installedScene = join(project, 'extensions', 'cocos3-codex-bridge', 'scene.js');
     const sceneSource = await readFile(installedScene, 'utf8');

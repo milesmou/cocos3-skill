@@ -66,6 +66,10 @@
 
 通过 Creator 3.8.5-3.8.x Inspector 使用的内部 WebGL 渲染器，以强制 2D 模式导出真实 Prefab PNG。
 
+### capture-cocos-runtime
+
+通过本机运行时桥接捕捉当前普通 Web 预览的 `GameCanvas`，将真实运行画面保存为工程内 PNG。
+
 ### import-cocos-assets
 
 将外部文件或目录批量导入 Creator 3.8 工程，生成主 UUID、图片子资源 UUID 和 Spine atlas 关联。支持 PNG、脚本、JSON、文本、音频、Effect、Material 与 Spine 资源组。
@@ -93,6 +97,10 @@ Codex Skill
 
 通过 Creator 的实际类型注册、资源数据库、Prefab 管理和撤销系统完成内容修改。
 
+## 临时资源目录
+
+所有 Skill 生成的一次性截图、预览图、验证报告、调试转储、备份和中间文件必须写入目标 Cocos 工程的 `temp/<skill-name>/`。禁止将临时资源写入工程根目录、`assets`、Skill 目录或工程外部路径。正式资源、场景、Prefab、脚本和用户明确指定的交付文件不属于临时资源。
+
 ## 目录结构
 
 ```text
@@ -111,6 +119,8 @@ cocos-skill/
 ├── manage-cocos-animation/
 ├── plan-cocos-prefab-tree/
 ├── assemble-cocos-ui/
+├── capture-cocos-runtime/
+├── cocos-prefab-preview/
 ├── import-cocos-assets/
 ├── move-cocos-asset/
 ├── rename-cocos-asset/
@@ -138,7 +148,7 @@ cocos-skill/
 cocoscreator --project <工程目录>
 node control-cocos-editor/scripts/install-bridge.mjs --project <工程目录>
 node control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> status
-node control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> --timeout 60000 preview db://assets/ui/example.prefab temp/previews/example.png
+node control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> --timeout 60000 preview db://assets/ui/example.prefab temp/cocos-prefab-preview/example.png
 ```
 
 脚本会检查 `package.json` 中的 Creator 版本。桥接服务只监听 `127.0.0.1`，连接信息和一次性令牌保存在目标工程的 `temp` 目录。
@@ -150,6 +160,7 @@ node control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> --ti
 - 修改前查询 UUID 和当前状态，修改后保存并验证。
 - 禁止资源路径越过目标工程的 `assets` 目录。
 - 设置属性时禁止修改关键序列化关联字段。
+- 一次性输出和中转文件统一放在目标工程 `temp/<skill-name>/`，不得散落到工程其他目录。
 
 ## 验证
 

@@ -24,7 +24,7 @@ description: 使用 Cocos Creator 3.8.5-3.8.x 编辑器内部 Prefab WebGL 渲�
 
 4. 检查返回的 UUID、尺寸、字节数和绝对输出路径，再查看 PNG。
 
-输出必须位于目标工程内并使用 `.png`。桥接会临时打开一个 Creator `simple` 面板，复用 Inspector 的 `PreviewExtends`、`scene:prefab-preview` 和 `query-prefab-preview-data`，强制切换并确认 2D 视图，完成 WebGL 绘制后立即读取 Canvas。它不会修改 Prefab。
+输出必须位于目标工程的 `temp/cocos-prefab-preview/`（或其子目录）并使用 `.png`。桥接会拒绝 `temp/` 以外的路径。它会临时打开一个 Creator `simple` 面板，复用 Inspector 的 `PreviewExtends`、`scene:prefab-preview` 和 `query-prefab-preview-data`，强制切换并确认 2D 视图，完成 WebGL 绘制后立即读取 Canvas，不会修改 Prefab。
 
 ## 验收
 

@@ -9,8 +9,9 @@ function usage(message) {
     'Usage:',
     '  node cocos-editor.mjs --project <dir> status',
     '  node cocos-editor.mjs --project <dir> [--timeout <ms>] [--poll <ms>] wait <ready|idle>',
-    '  node cocos-editor.mjs --project <dir> [--width <px>] [--height <px>] preview <prefab-url-or-uuid> <output.png>',
+    '  node cocos-editor.mjs --project <dir> [--width <px>] [--height <px>] preview <prefab-url-or-uuid> <temp/output.png>',
     '  node cocos-editor.mjs --project <dir> runtime-stats [options-json]',
+    '  node cocos-editor.mjs --project <dir> runtime-screenshot <temp/output.png>',
     '  node cocos-editor.mjs --project <dir> request <scene|asset-db|scene-script> <method> [args-json]',
     '',
     'args-json must be a JSON array. Example:',
@@ -129,6 +130,13 @@ try {
       method: 'runtime-node-stats',
       args: [runtimeOptions]
     }, options.timeout);
+  } else if (options.command === 'runtime-screenshot') {
+    if (!options.target) usage('runtime-screenshot output PNG path is required');
+    result = await requestBridge(info, {
+      target: 'bridge',
+      method: 'export-runtime-screenshot',
+      args: [{ output: options.target }]
+    }, options.timeout);
   } else if (options.command === 'request') {
     if (!['bridge', 'scene', 'asset-db', 'scene-script'].includes(options.target)) usage('invalid request target');
     if (!options.method) usage('request method is required');
@@ -137,7 +145,7 @@ try {
     if (!Array.isArray(args)) usage('args-json must be a JSON array');
     result = await requestBridge(info, { target: options.target, method: options.method, args }, options.timeout);
   } else {
-    usage('command must be status, wait, preview, runtime-stats, or request');
+    usage('command must be status, wait, preview, runtime-stats, runtime-screenshot, or request');
   }
   console.log(JSON.stringify(result, null, 2));
 } catch (error) {

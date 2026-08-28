@@ -25,6 +25,8 @@ node scripts/validate-project.mjs --project <工程目录>
 node scripts/validate-project.mjs --project <工程目录> --json
 ```
 
+命令默认只向终端输出。若需要保存一次性验证报告，必须重定向到工程 `temp/validate-cocos-content/`，不得写入工程根目录或 `assets`。
+
 错误包括无效对象表、越界 `__id__`、缺失 `.meta` 和重复 UUID。未解析的资源 UUID 作为警告，因为它可能来自 `internal` 或其他只读数据库。
 
 修改前保存验证基线；修改后必须重新运行。存在 error 时不要继续批量修改或提交。

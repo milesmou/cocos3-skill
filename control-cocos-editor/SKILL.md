@@ -1,6 +1,6 @@
 ---
 name: control-cocos-editor
-description: 安装并使用本地认证桥接扩展，通过 Cocos Creator 3.8 官方 Scene、AssetDB 消息和 Scene Script API 控制编辑器，并按需读取普通 Web 预览当前实例的运行时节点统计。适用于连接编辑器、查询或修改编辑内容、保存、等待资源导入和检查运行时节点数量状态。
+description: 安装并使用本地认证桥接扩展，通过 Cocos Creator 3.8 官方 Scene、AssetDB 消息和 Scene Script API 控制编辑器，并按需读取普通 Web 预览的运行时节点统计或捕捉 GameCanvas。适用于连接编辑器、查询或修改编辑内容、保存、等待资源导入和检查运行时状态。
 ---
 
 # 控制 Cocos Creator 编辑器
@@ -41,6 +41,8 @@ description: 安装并使用本地认证桥接扩展，通过 Cocos Creator 3.8 
 
 连接文件只写入目标工程的 `temp/cocos3-codex-bridge.json`，服务只监听 `127.0.0.1`，每次扩展启动都会生成新令牌。
 
+所有一次性截图、预览、报告、调试转储和中间文件必须写入目标工程的 `temp/<skill-name>/`。桥接提供的 PNG 导出接口会拒绝 `temp` 目录以外的输出路径。
+
 ## 调用
 
 使用统一命令调用 Scene、AssetDB 或 Scene Script：
@@ -57,15 +59,19 @@ node scripts/cocos-editor.mjs --project <工程目录> request scene-script insp
 
 需要查看开发人员当前正常运行的 Web 预览节点数量、激活状态或组件数量时，先读取并遵循 [references/runtime-node-stats.md](references/runtime-node-stats.md)。该功能只在收到命令时遍历一次节点树，不持续采样。
 
+## 运行时画面截图
+
+需要捕捉开发人员当前正常运行的 Web 预览画面时，使用 `capture-cocos-runtime` Skill。该功能只捕捉 `GameCanvas`，不包含节点树等 DOM 调试层。
+
 ## 导出 Prefab PNG
 
 Creator 3.8.5-3.8.x 可调用 Inspector 使用的内部 WebGL 预览器：
 
 ```powershell
-node scripts/cocos-editor.mjs --project <工程目录> --timeout 60000 --width 1024 --height 768 preview db://assets/ui/example.prefab temp/previews/example.png
+node scripts/cocos-editor.mjs --project <工程目录> --timeout 60000 --width 1024 --height 768 preview db://assets/ui/example.prefab temp/cocos-prefab-preview/example.png
 ```
 
-该接口属于 Creator 内部实现。桥接会检查版本、强制确认 2D 预览模式并限制输出位于目标工程内；编辑器不可用或内部接口失败时停止并报告。
+该接口属于 Creator 内部实现。桥接会检查版本、强制确认 2D 预览模式并限制输出位于目标工程的 `temp/` 内；编辑器不可用或内部接口失败时停止并报告。
 
 ## 安全规则
 
