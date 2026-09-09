@@ -5,15 +5,19 @@ description: 验证 Cocos Creator 3.8 工程、当前场景或 Prefab 的节点�
 
 # 验证 Cocos 内容
 
-同时执行在线和离线验证；在线结果用于确认引擎反序列化状态，离线结果用于覆盖全部资源。
+编辑器及桥接可用时执行在线和离线验证；编辑器不可用时执行离线诊断，并明确在线状态未验证，不为完成诊断强制启动编辑器。在线结果反映当前编辑上下文，离线结果反映磁盘资源；未保存修改不会包含在离线结果中。
+
+命令中的 `<技能根目录>` 替换为本技能集合所在目录的绝对路径（包含 `control-cocos-editor` 等子目录），`<工程目录>` 替换为目标 Cocos 工程绝对路径；保留路径引号，不依赖当前工作目录。
 
 ## 在线验证
 
+先查询当前编辑上下文。仅对含 UI 的目标调用 validateUI，使用查询得到的 UI 根节点 UUID；多个 UI 根分别验证，无 UI 时跳过，不假定存在名为 Canvas 的节点。
+
 ```powershell
-node ../control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> request scene-script validateScene '[]'
-node ../control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> request scene-script validateUI '["Canvas",{}]'
-node ../control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> request scene query-dirty '[]'
-node ../control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> request asset-db is-busy '[]'
+node "<技能根目录>/control-cocos-editor/scripts/cocos-editor.mjs" --project "<工程目录>" request scene-script validateScene '[]'
+node "<技能根目录>/control-cocos-editor/scripts/cocos-editor.mjs" --project "<工程目录>" request scene-script validateUI '["<UI根节点UUID>",{}]'
+node "<技能根目录>/control-cocos-editor/scripts/cocos-editor.mjs" --project "<工程目录>" request scene query-dirty '[]'
+node "<技能根目录>/control-cocos-editor/scripts/cocos-editor.mjs" --project "<工程目录>" request asset-db is-busy '[]'
 ```
 
 必要时对关键资源调用 `query-missing-asset-info`、`query-asset-dependencies` 和 `query-asset-users`。
@@ -21,8 +25,8 @@ node ../control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> r
 ## 离线验证
 
 ```powershell
-node scripts/validate-project.mjs --project <工程目录>
-node scripts/validate-project.mjs --project <工程目录> --json
+node "<技能根目录>/validate-cocos-content/scripts/validate-project.mjs" --project "<工程目录>"
+node "<技能根目录>/validate-cocos-content/scripts/validate-project.mjs" --project "<工程目录>" --json
 ```
 
 命令默认只向终端输出。若需要保存一次性验证报告，必须重定向到工程 `temp/validate-cocos-content/`，不得写入工程根目录或 `assets`。

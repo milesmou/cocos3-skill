@@ -7,6 +7,8 @@ description: 使用 Cocos Creator 3.8.5-3.8.x 编辑器内部 Prefab WebGL 渲�
 
 只使用 Creator 内部真实渲染。编辑器不可用、版本低于 3.8.5 或内部接口失败时停止并报告，不生成近似预览。
 
+命令中的 `<技能根目录>` 替换为本技能集合所在目录的绝对路径（包含 `control-cocos-editor` 等子目录），`<工程目录>` 替换为目标 Cocos 工程绝对路径；保留路径引号，不依赖当前工作目录。
+
 ## 真实 PNG
 
 1. 安装并刷新 `control-cocos-editor` 桥接扩展 1.2.0 或更高版本。
@@ -14,12 +16,12 @@ description: 使用 Cocos Creator 3.8.5-3.8.x 编辑器内部 Prefab WebGL 渲�
 3. 使用 `db://assets/...` URL 或 Prefab UUID 导出：
 
    ```powershell
-   node ../control-cocos-editor/scripts/cocos-editor.mjs `
-     --project <工程目录> `
+   node "<技能根目录>/control-cocos-editor/scripts/cocos-editor.mjs" `
+     --project "<工程目录>" `
      --timeout 60000 `
      --width 1024 `
      --height 768 `
-     preview db://assets/ui/example.prefab temp/cocos-previews/example.png
+     preview db://assets/ui/example.prefab temp/cocos-prefab-preview/example.png
    ```
 
 4. 检查返回的 UUID、尺寸、字节数和绝对输出路径，再查看 PNG。

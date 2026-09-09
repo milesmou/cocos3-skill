@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
-import { access, readFile, rename, stat } from 'node:fs/promises';
+import { access, readFile, stat } from 'node:fs/promises';
+import { movePair } from './move-pair.mjs';
 import { basename, dirname, isAbsolute, relative, resolve, sep } from 'node:path';
 
 function usage(message) {
@@ -67,12 +68,7 @@ try {
   if (await exists(`${destination}.meta`)) throw new Error(`destination meta already exists: ${destination}.meta`);
 
   if (!options.dryRun) {
-    await rename(source, destination);
-    try { await rename(`${source}.meta`, `${destination}.meta`); }
-    catch (error) {
-      try { await rename(destination, source); } catch {}
-      throw error;
-    }
+    await movePair(source, destination);
   }
   console.log(`${options.dryRun ? 'Validated move of' : 'Moved'} ${relative(assetsDir, source)} -> ${relative(assetsDir, destination)}`);
 } catch (error) { usage(error.message); }

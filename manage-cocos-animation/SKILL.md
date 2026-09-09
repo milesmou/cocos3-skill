@@ -7,11 +7,13 @@ description: 查询和编辑 Cocos Creator 3.8 Animation 根节点、AnimationCl
 
 动画操作依赖 Creator 3.8 的编辑器动画管理器。修改前必须保存 clip dump 作为回滚基线。
 
+命令中的 `<技能根目录>` 替换为本技能集合所在目录的绝对路径（包含 `control-cocos-editor` 等子目录），`<工程目录>` 替换为目标 Cocos 工程绝对路径；保留路径引号，不依赖当前工作目录。
+
 ## 查询
 
 ```powershell
-node ../control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> request scene-script animationQuery '["queryAnimationRootInfo","<节点UUID>"]'
-node ../control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> request scene-script animationQuery '["queryAnimationClipDump","<动画根UUID>","<Clip UUID>"]'
+node "<技能根目录>/control-cocos-editor/scripts/cocos-editor.mjs" --project "<工程目录>" request scene-script animationQuery '["queryAnimationRootInfo","<节点UUID>"]'
+node "<技能根目录>/control-cocos-editor/scripts/cocos-editor.mjs" --project "<工程目录>" request scene-script animationQuery '["queryAnimationClipDump","<动画根UUID>","<Clip UUID>"]'
 ```
 
 ## 修改
@@ -20,14 +22,14 @@ node ../control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> r
 2. 将目标 clip 设为当前编辑 clip：
 
    ```powershell
-   node ../control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> request scene-script animationQuery '["setEditClip","<Clip UUID>"]'
+   node "<技能根目录>/control-cocos-editor/scripts/cocos-editor.mjs" --project "<工程目录>" request scene-script animationQuery '["setEditClip","<Clip UUID>"]'
    ```
 
 3. 生成 Creator 3.8 动画管理器接受的 operation 数组；不要猜测函数名或参数。
 4. 一次提交同一意图的操作：
 
    ```powershell
-   node ../control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> request scene-script animationOperation '[[{"funcName":"<从当前编辑器操作模型确认的方法>","args":[]}],{}]'
+   node "<技能根目录>/control-cocos-editor/scripts/cocos-editor.mjs" --project "<工程目录>" request scene-script animationOperation '[[{"funcName":"<从当前编辑器操作模型确认的方法>","args":[]}],{}]'
    ```
 
 5. 查询 clip dump 对比结果。

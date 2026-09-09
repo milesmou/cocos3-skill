@@ -1,18 +1,18 @@
 # Bridge command reference
 
-Use `node control-cocos-editor/scripts/cocos-editor.mjs --project <project> request <target> <method> '<args-array>'`.
+Use `node "<技能根目录>/control-cocos-editor/scripts/cocos-editor.mjs" --project "<project>" request <target> <method> '<args-array>'`.
 
 Request one runtime node-count snapshot from every connected normal Web preview instance:
 
 ```powershell
-node control-cocos-editor/scripts/cocos-editor.mjs --project <project> runtime-stats
-node control-cocos-editor/scripts/cocos-editor.mjs --project <project> runtime-stats '{"root":"Scene/Canvas","topComponents":20}'
+node "<技能根目录>/control-cocos-editor/scripts/cocos-editor.mjs" --project "<project>" runtime-stats
+node "<技能根目录>/control-cocos-editor/scripts/cocos-editor.mjs" --project "<project>" runtime-stats '{"root":"Scene/Canvas","topComponents":20}'
 ```
 
 Export a Prefab through Creator 3.8.5-3.8.x's internal WebGL renderer:
 
 ```powershell
-node control-cocos-editor/scripts/cocos-editor.mjs --project <project> --timeout 60000 --width 1024 --height 768 preview db://assets/ui/example.prefab temp/cocos-prefab-preview/example.png
+node "<技能根目录>/control-cocos-editor/scripts/cocos-editor.mjs" --project "<project>" --timeout 60000 --width 1024 --height 768 preview db://assets/ui/example.prefab temp/cocos-prefab-preview/example.png
 ```
 
 The output must be a `.png` inside the target project's `temp/` directory. The bridge rejects paths elsewhere. This opens a temporary simple panel, calls the internal `scene:prefab-preview` renderer, switches and verifies `is2DView`, captures its WebGL canvas, and closes the panel if the bridge opened it. A successful result includes `"previewMode": "2D"`.

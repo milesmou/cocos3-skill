@@ -7,17 +7,19 @@ description: 通过 Cocos Creator 3.8 编辑器查询可注册组件和节点组
 
 优先通过注册类名和组件 UUID 操作，不手写组件 `__type__`。
 
+命令中的 `<技能根目录>` 替换为本技能集合所在目录的绝对路径（包含 `control-cocos-editor` 等子目录），`<工程目录>` 替换为目标 Cocos 工程绝对路径；保留路径引号，不依赖当前工作目录。
+
 ## 查询和添加
 
 ```powershell
-node ../control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> request scene query-components '[]'
-node ../control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> request scene-script listComponents '[{"uuid":"<节点UUID>"}]'
+node "<技能根目录>/control-cocos-editor/scripts/cocos-editor.mjs" --project "<工程目录>" request scene query-components '[]'
+node "<技能根目录>/control-cocos-editor/scripts/cocos-editor.mjs" --project "<工程目录>" request scene-script listComponents '[{"uuid":"<节点UUID>"}]'
 ```
 
 添加任何组件前，必须先调用 `listComponents` 检查目标节点。按注册类名判断节点是否已有目标组件：已有则复用其组件 UUID，并根据需要修改属性；只有缺失时才执行添加：
 
 ```powershell
-node ../control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> request scene create-component '[{"uuid":"<节点UUID>","component":"cc.Label"}]'
+node "<技能根目录>/control-cocos-editor/scripts/cocos-editor.mjs" --project "<工程目录>" request scene create-component '[{"uuid":"<节点UUID>","component":"cc.Label"}]'
 ```
 
 不要在同一节点重复添加同类型组件。自定义组件必须先确认脚本已成功导入，并使用 `query-classes` 或 `query-components` 返回的注册类名进行检查和添加。
@@ -27,7 +29,7 @@ node ../control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> r
 首选 `query-component` + `set-property`：
 
 ```powershell
-node ../control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> request scene set-property '[{"uuid":"<组件UUID>","path":"string","dump":{"value":"标题"},"record":true}]'
+node "<技能根目录>/control-cocos-editor/scripts/cocos-editor.mjs" --project "<工程目录>" request scene set-property '[{"uuid":"<组件UUID>","path":"string","dump":{"value":"标题"},"record":true}]'
 ```
 
 引用和值类型复杂、公开 dump 无法表达时，使用 Scene Script 的 `setComponentProperties`。它支持 `$node`、`$component`、`$asset` 以及 `Vec2`、`Vec3`、`Quat`、`Color`、`Size` 描述符；使用后立即保存并验证。
@@ -35,8 +37,8 @@ node ../control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> r
 ## 重置和删除
 
 ```powershell
-node ../control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> request scene reset-component '[{"uuid":"<组件UUID>"}]'
-node ../control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> request scene remove-component '[{"uuid":"<组件UUID>"}]'
+node "<技能根目录>/control-cocos-editor/scripts/cocos-editor.mjs" --project "<工程目录>" request scene reset-component '[{"uuid":"<组件UUID>"}]'
+node "<技能根目录>/control-cocos-editor/scripts/cocos-editor.mjs" --project "<工程目录>" request scene remove-component '[{"uuid":"<组件UUID>"}]'
 ```
 
 删除前查询资源和其他组件引用。不要移除维持节点有效性所需的组件。

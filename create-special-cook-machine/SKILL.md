@@ -73,7 +73,7 @@ description: >
    - 隐藏库存条 / 补货条后，必须处理 `roleActiveMeCheck`：父类可能把「条未激活」当成异常自愈。
 
 5. **创建与挂载**
-   - 用 `create-cocos-component-script` 流程写入 TS、等导入、确认 `ccclass` 注册。
+   - 复用 `../create-cocos-component-script/SKILL.md` 的创建、导入和注册步骤，写入已完成的 cookMachine 子类；不重新进入该技能的业务分流或普通 Component 模板。
    - 用编辑器技能打开目标 Prefab，卸掉或替换旧 `cookMachine`，挂上新类；保存并 `wait idle`。
    - 不要手改 Prefab 序列化文本。
 

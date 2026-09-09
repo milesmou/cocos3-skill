@@ -9,19 +9,21 @@ description: 使用 Node.js 离线重命名 Cocos Creator 3.8 资源及配套 .m
 
 使用技能内置脚本同步重命名资源和 `.meta`。不要创建新的 `.meta`。
 
+命令中的 `<技能根目录>` 替换为本技能集合所在目录的绝对路径（包含 `control-cocos-editor` 等子目录），`<工程目录>` 替换为目标 Cocos 工程绝对路径；保留路径引号，不依赖当前工作目录。
+
 ## 操作流程
 
 1. 指定相对于 `assets` 的资源路径和不含路径分隔符的新名称。文件资源必须保持扩展名不变。
 2. 先验证：
 
    ```powershell
-   node scripts/rename-asset.mjs --project <工程目录> --asset <资源路径> --name <新名称> --dry-run
+   node "<技能根目录>/rename-cocos-asset/scripts/rename-asset.mjs" --project "<工程目录>" --asset <资源路径> --name <新名称> --dry-run
    ```
 
 3. 执行重命名：
 
    ```powershell
-   node scripts/rename-asset.mjs --project <工程目录> --asset <资源路径> --name <新名称>
+   node "<技能根目录>/rename-cocos-asset/scripts/rename-asset.mjs" --project "<工程目录>" --asset <资源路径> --name <新名称>
    ```
 
 4. 新资源或新 `.meta` 已存在时停止，不覆盖。

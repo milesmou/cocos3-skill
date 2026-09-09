@@ -7,7 +7,7 @@ description: 通过 Cocos Creator 3.8 AssetDB 创建 TypeScript 组件脚本、�
 
 遵循项目根 `AGENTS.md` 的 TypeScript、性能、资源和日志规范。不要生成 JSB、Native 或 C++ 绑定。
 
-若需求是战斗烹饪设施的章节专用逻辑（特殊设备 / `cookMachine` 子类 / `Level_X/scripts`），停止本流程，改读并遵循 `create-special-cook-machine/SKILL.md`。
+若需求是战斗烹饪设施的章节专用逻辑（特殊设备 / `cookMachine` 子类 / `Level_X/scripts`），由 `../create-special-cook-machine/SKILL.md` 负责业务设计；若已由该技能完成子类内容并转入创建与注册阶段，直接执行下方 AssetDB 导入、注册和挂载步骤，不再次分流，也不套用普通 Component 模板。
 
 ## 工作流
 

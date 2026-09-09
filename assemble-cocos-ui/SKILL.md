@@ -9,6 +9,8 @@ description: 根据明确的节点蓝图或执行规格，通过 Cocos Creator 3
 
 先连接 `control-cocos-editor`，再组合使用 `manage-cocos-node`、`manage-cocos-components`、`manage-cocos-assets`、`manage-cocos-prefab-instance` 和 `manage-cocos-event-handlers`。详细约束见 [references/ui-rules.md](references/ui-rules.md)。
 
+命令中的 `<技能根目录>` 替换为本技能集合所在目录的绝对路径（包含 `control-cocos-editor` 等子目录），`<工程目录>` 替换为目标 Cocos 工程绝对路径；保留路径引号，不依赖当前工作目录。
+
 ## 工作流
 
 1. 等待编辑器就绪，保存当前上下文，并用 `inspectUILayout` 记录基线。
@@ -24,7 +26,7 @@ description: 根据明确的节点蓝图或执行规格，通过 Cocos Creator 3
 6. 运行 UI 专用校验，修复 error，并审查 warning：
 
    ```powershell
-   node ../control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> request scene-script validateUI '["<根节点UUID>",{}]'
+   node "<技能根目录>/control-cocos-editor/scripts/cocos-editor.mjs" --project "<工程目录>" request scene-script validateUI '["<根节点UUID>",{}]'
    ```
 
 7. 保存场景或 Prefab，等待 AssetDB idle，重新检查布局树和关键资源引用。
@@ -32,7 +34,7 @@ description: 根据明确的节点蓝图或执行规格，通过 Cocos Creator 3
 ## 查询布局
 
 ```powershell
-node ../control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> request scene-script inspectUILayout '["<根节点UUID>",{"maxDepth":12}]'
+node "<技能根目录>/control-cocos-editor/scripts/cocos-editor.mjs" --project "<工程目录>" request scene-script inspectUILayout '["<根节点UUID>",{"maxDepth":12}]'
 ```
 
 输出包含尺寸、锚点、Widget、Layout、组件、SpriteFrame、字体、ScrollView content/view 和层级顺序。

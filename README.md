@@ -136,19 +136,21 @@ cocos-skill/
 
 ## 环境要求
 
+命令中的 `<技能根目录>` 是本技能集合的绝对路径，`<工程目录>` 是目标 Cocos 工程的绝对路径；替换占位符并保留引号。测试命令在技能根目录执行。
+
 - Cocos Creator 3.8.x
 - 可用的 `cocoscreator` 命令
 - 同一个工程最多运行一个 Creator 实例；启动前先检查，已打开时复用现有实例
 - Node.js 18 或更高版本
 - 目标工程必须包含有效的 `package.json` 和 `assets` 目录
 
-在线控制前，先确认目标工程没有已运行的 Creator 实例。工程已打开时直接复用，禁止重复启动；工程未打开时使用 `cocoscreator --project <工程目录>` 启动。需要重启时，先完全关闭旧实例，再执行启动命令。然后在目标工程安装并启用桥接扩展：
+在线控制前，先确认目标工程没有已运行的 Creator 实例。工程已打开时直接复用，禁止重复启动；工程未打开时使用 `cocoscreator --project "<工程目录>"` 启动。需要重启时，先完全关闭旧实例，再执行启动命令。然后在目标工程安装并启用桥接扩展：
 
 ```powershell
-cocoscreator --project <工程目录>
-node control-cocos-editor/scripts/install-bridge.mjs --project <工程目录>
-node control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> status
-node control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> --timeout 60000 preview db://assets/ui/example.prefab temp/cocos-prefab-preview/example.png
+cocoscreator --project "<工程目录>"
+node "<技能根目录>/control-cocos-editor/scripts/install-bridge.mjs" --project "<工程目录>"
+node "<技能根目录>/control-cocos-editor/scripts/cocos-editor.mjs" --project "<工程目录>" status
+node "<技能根目录>/control-cocos-editor/scripts/cocos-editor.mjs" --project "<工程目录>" --timeout 60000 preview db://assets/ui/example.prefab temp/cocos-prefab-preview/example.png
 ```
 
 脚本会检查 `package.json` 中的 Creator 版本。桥接服务只监听 `127.0.0.1`，连接信息和一次性令牌保存在目标工程的 `temp` 目录。
@@ -166,5 +168,5 @@ node control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> --ti
 
 ```powershell
 node --test tests/*.test.mjs
-node validate-cocos-content/scripts/validate-project.mjs --project <工程目录>
+node "<技能根目录>/validate-cocos-content/scripts/validate-project.mjs" --project "<工程目录>"
 ```

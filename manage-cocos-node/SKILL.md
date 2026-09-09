@@ -7,20 +7,22 @@ description: 通过 Cocos Creator 3.8 Scene 消息在当前场景或 Prefab 编�
 
 优先使用 Scene 消息，让 Creator 记录撤销。节点路径只用于初次定位；修改请求使用 UUID。
 
+命令中的 `<技能根目录>` 替换为本技能集合所在目录的绝对路径（包含 `control-cocos-editor` 等子目录），`<工程目录>` 替换为目标 Cocos 工程绝对路径；保留路径引号，不依赖当前工作目录。
+
 ## 常用操作
 
 ```powershell
 # 创建节点
-node ../control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> request scene create-node '[{"parent":"<父节点UUID>","name":"New Node","snapshot":true}]'
+node "<技能根目录>/control-cocos-editor/scripts/cocos-editor.mjs" --project "<工程目录>" request scene create-node '[{"parent":"<父节点UUID>","name":"New Node","snapshot":true}]'
 
 # 复制节点
-node ../control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> request scene duplicate-node '["<节点UUID>"]'
+node "<技能根目录>/control-cocos-editor/scripts/cocos-editor.mjs" --project "<工程目录>" request scene duplicate-node '["<节点UUID>"]'
 
 # 改父级并保留世界变换
-node ../control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> request scene set-parent '[{"parent":"<新父节点UUID>","uuids":"<节点UUID>","keepWorldTransform":true}]'
+node "<技能根目录>/control-cocos-editor/scripts/cocos-editor.mjs" --project "<工程目录>" request scene set-parent '[{"parent":"<新父节点UUID>","uuids":"<节点UUID>","keepWorldTransform":true}]'
 
 # 删除
-node ../control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> request scene remove-node '[{"uuid":"<节点UUID>"}]'
+node "<技能根目录>/control-cocos-editor/scripts/cocos-editor.mjs" --project "<工程目录>" request scene remove-node '[{"uuid":"<节点UUID>"}]'
 ```
 
 ## 设置属性
@@ -31,7 +33,7 @@ node ../control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> r
 4. 调用：
 
    ```powershell
-   node ../control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> request scene set-property '[{"uuid":"<节点UUID>","path":"position","dump":{"value":{"x":10,"y":20,"z":0}},"record":true}]'
+   node "<技能根目录>/control-cocos-editor/scripts/cocos-editor.mjs" --project "<工程目录>" request scene set-property '[{"uuid":"<节点UUID>","path":"position","dump":{"value":{"x":10,"y":20,"z":0}},"record":true}]'
    ```
 
 批量操作前调用 `scene snapshot`，失败时调用 `snapshot-abort`。完成后保存并重新查询节点验证结果。

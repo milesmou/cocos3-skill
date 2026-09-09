@@ -7,6 +7,8 @@ description: 捕捉当前正在运行的 Cocos Creator 3.8 普通 Web 预览 Gam
 
 复用 `control-cocos-editor` 安装的本机桥接和项目 `preview-template`，只捕捉开发人员当前正在操作的普通 Web 预览，不启动第二个浏览器。
 
+命令中的 `<技能根目录>` 替换为本技能集合所在目录的绝对路径（包含 `control-cocos-editor` 等子目录），`<工程目录>` 替换为目标 Cocos 工程绝对路径；保留路径引号，不依赖当前工作目录。
+
 ## 工作流
 
 1. 读取并遵循 `../control-cocos-editor/SKILL.md` 和 `../control-cocos-editor/references/runtime-node-stats.md`。
@@ -14,8 +16,8 @@ description: 捕捉当前正在运行的 Cocos Creator 3.8 普通 Web 预览 Gam
 3. 将截图保存到工程 `temp/capture-cocos-runtime/` 下的 `.png` 路径：
 
    ```powershell
-   node ../control-cocos-editor/scripts/cocos-editor.mjs `
-     --project <工程目录> `
+   node "<技能根目录>/control-cocos-editor/scripts/cocos-editor.mjs" `
+     --project "<工程目录>" `
      --timeout 15000 `
      runtime-screenshot temp/capture-cocos-runtime/current.png
    ```

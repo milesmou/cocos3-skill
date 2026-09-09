@@ -7,18 +7,20 @@ description: 通过 Cocos Creator 3.8 编辑器消息创建、查询、打开、
 
 先使用 `control-cocos-editor` 连接 Creator，再执行场景操作。
 
+命令中的 `<技能根目录>` 替换为本技能集合所在目录的绝对路径（包含 `control-cocos-editor` 等子目录），`<工程目录>` 替换为目标 Cocos 工程绝对路径；保留路径引号，不依赖当前工作目录。
+
 ## 工作流
 
 1. 查询场景资源：
 
    ```powershell
-   node ../control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> request asset-db query-assets '[{"pattern":"db://assets/**/*.scene"}]'
+   node "<技能根目录>/control-cocos-editor/scripts/cocos-editor.mjs" --project "<工程目录>" request asset-db query-assets '[{"pattern":"db://assets/**/*.scene"}]'
    ```
 
 2. 使用资源 UUID 打开场景：
 
    ```powershell
-   node ../control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> request scene open-scene '["<场景UUID>"]'
+   node "<技能根目录>/control-cocos-editor/scripts/cocos-editor.mjs" --project "<工程目录>" request scene open-scene '["<场景UUID>"]'
    ```
 
 3. 等待 `query-is-ready` 返回 `true`，再检查节点树和场景属性。
@@ -26,8 +28,8 @@ description: 通过 Cocos Creator 3.8 编辑器消息创建、查询、打开、
 5. 查询 dirty 状态并保存：
 
    ```powershell
-   node ../control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> request scene query-dirty '[]'
-   node ../control-cocos-editor/scripts/cocos-editor.mjs --project <工程目录> request scene save-scene '[]'
+   node "<技能根目录>/control-cocos-editor/scripts/cocos-editor.mjs" --project "<工程目录>" request scene query-dirty '[]'
+   node "<技能根目录>/control-cocos-editor/scripts/cocos-editor.mjs" --project "<工程目录>" request scene save-scene '[]'
    ```
 
 ## 创建场景资源

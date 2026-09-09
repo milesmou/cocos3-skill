@@ -9,19 +9,21 @@ description: 使用 Node.js 离线导入 Cocos Creator 3.8 外部资源并生成
 
 使用技能内置脚本复制资源并生成 Creator 3.8 元数据。不要手工复制样本 `.meta`，以免不同工程之间发生 UUID 冲突。
 
+命令中的 `<技能根目录>` 替换为本技能集合所在目录的绝对路径（包含 `control-cocos-editor` 等子目录），`<工程目录>` 替换为目标 Cocos 工程绝对路径；保留路径引号，不依赖当前工作目录。
+
 ## 操作流程
 
 1. 确定外部文件或目录，以及相对于目标工程 `assets` 的目标目录。
 2. 先验证导入计划：
 
    ```powershell
-   node scripts/import-assets.mjs --project <工程目录> --source <外部文件或目录> --destination <assets相对目录> --dry-run
+   node "<技能根目录>/import-cocos-assets/scripts/import-assets.mjs" --project "<工程目录>" --source <外部文件或目录> --destination <assets相对目录> --dry-run
    ```
 
 3. 执行导入：
 
    ```powershell
-   node scripts/import-assets.mjs --project <工程目录> --source <外部文件或目录> --destination <assets相对目录>
+   node "<技能根目录>/import-cocos-assets/scripts/import-assets.mjs" --project "<工程目录>" --source <外部文件或目录> --destination <assets相对目录>
    ```
 
 4. 导入前检查工程目标目录中的同名资源及其 `.meta`。若名称已存在，默认在扩展名前追加递增编号（如 `icon.png` 改为 `icon_1.png`），直到名称可用；不要覆盖或复用同名资源。只有用户明确要求更新已有资源时才使用 `--force`；此时保留已有 `.meta` 和 UUID。

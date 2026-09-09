@@ -8,7 +8,7 @@ Use this workflow to inspect the node-count state of the same normal Cocos Creat
 2. Install the preview hook:
 
    ```powershell
-   node control-cocos-editor/scripts/install-runtime-inspector.mjs --project <project>
+   node "<技能根目录>/control-cocos-editor/scripts/install-runtime-inspector.mjs" --project "<project>"
    ```
 
    The installer preserves an existing `preview-template/index.ejs`, adds one marked script tag, and copies `runtime-node-inspector.js`. If the project has no preview template, it copies the matching Creator 3.8 built-in template first. Never hand-edit the editor's built-in template or engine source.
@@ -22,13 +22,13 @@ The preview hook keeps only a local EventSource connection to the project bridge
 Capture all connected preview instances:
 
 ```powershell
-node control-cocos-editor/scripts/cocos-editor.mjs --project <project> runtime-stats
+node "<技能根目录>/control-cocos-editor/scripts/cocos-editor.mjs" --project "<project>" runtime-stats
 ```
 
 Restrict the count to a unique hierarchy path and control the component summary size:
 
 ```powershell
-node control-cocos-editor/scripts/cocos-editor.mjs --project <project> runtime-stats '{"root":"Scene/Canvas","topComponents":20}'
+node "<技能根目录>/control-cocos-editor/scripts/cocos-editor.mjs" --project "<project>" runtime-stats '{"root":"Scene/Canvas","topComponents":20}'
 ```
 
 Report each returned snapshot separately when more than one preview page is connected. Relevant fields are:
