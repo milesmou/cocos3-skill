@@ -1,4 +1,0 @@
-interface:
-  display_name: "Cocos Prefab 节点树规划"
-  short_description: "分析界面需求并生成只读的 Cocos Prefab 执行蓝图"
-  default_prompt: "使用 $plan-cocos-prefab-tree 分析界面需求并生成节点蓝图，不修改工程。"

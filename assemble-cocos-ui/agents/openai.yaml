@@ -1,4 +1,4 @@
 interface:
-  display_name: "Cocos UI 拼装"
-  short_description: "根据既定节点蓝图在 Creator 中拼装并验收 UI"
-  default_prompt: "使用 $assemble-cocos-ui 根据已有节点蓝图拼装并验收 Cocos UI。"
+  display_name: "Cocos UI 规划与拼装"
+  short_description: "分析工程结构并规划、拼装和验收 Cocos UI"
+  default_prompt: "使用 $assemble-cocos-ui 分析效果图和工程约定，生成 Prefab 节点蓝图；如果请求包含制作或实现，继续在 Creator 中拼装并验收 UI。"
