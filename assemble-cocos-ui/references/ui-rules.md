@@ -30,6 +30,11 @@
 - Before adding a serialized EventHandler, check whether the project's UI base class already routes clicks by button name or runtime listeners. Use one dispatch path for the same action.
 - Add `BlockInputEvents` to modal blockers when clicks must not pass through; its node needs a correctly sized `UITransform`.
 
+## Text decoration
+
+- Use `Label.isUnderline` for underlined text. Do not draw a text underline with a Sprite, Graphics, or a separate line node.
+- When only part of a sentence is underlined, split it into separately aligned Label nodes so only the linked phrases enable `isUnderline`.
+
 ## Placeholder visuals
 
 - Use a solid-color Sprite only when the corresponding art resource was not provided or cannot be uniquely identified in the project.
