@@ -12,7 +12,7 @@ description: 捕捉当前正在运行的 Cocos Creator 3.8 普通 Web 预览 Gam
 ## 工作流
 
 1. 读取并遵循 `../control-cocos-editor/SKILL.md` 和 `../control-cocos-editor/references/runtime-node-stats.md`。
-2. 执行 `status`，要求 `runtimeInspector.screenshotPng` 为 `true` 且 `runtimeInspector.connectedInstances` 恰好为 `1`。能力字段缺失时刷新或重载桥接扩展；没有连接时刷新现有 Web 预览；多个连接时关闭多余预览，禁止猜测目标实例。
+2. 执行 `status`，要求 `runtimeInspector.screenshotPng` 为 `true` 且 `runtimeInspector.connectedInstances` 恰好为 `1`。能力字段缺失时调用 Creator 顶部菜单 `开发者 -> 重新加载` 并等待桥接重新就绪；没有连接时刷新现有 Web 预览；多个连接时关闭多余预览，禁止猜测目标实例。
 3. 将截图保存到工程 `temp/capture-cocos-runtime/` 下的 `.png` 路径：
 
    ```powershell

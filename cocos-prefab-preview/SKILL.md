@@ -11,7 +11,7 @@ description: 使用 Cocos Creator 3.8.5-3.8.x 编辑器内部 Prefab WebGL 渲�
 
 ## 真实 PNG
 
-1. 安装并刷新 `control-cocos-editor` 桥接扩展 1.2.0 或更高版本。
+1. 安装或更新 `control-cocos-editor` 桥接扩展 1.2.0 或更高版本后，调用 Creator 顶部菜单 `开发者 -> 重新加载`，等待桥接重新就绪。
 2. 等待编辑器和 AssetDB 就绪。
 3. 使用 `db://assets/...` URL 或 Prefab UUID 导出：
 

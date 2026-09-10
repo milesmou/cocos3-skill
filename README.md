@@ -149,6 +149,8 @@ node "<技能根目录>/control-cocos-editor/scripts/cocos-editor.mjs" --project
 node "<技能根目录>/control-cocos-editor/scripts/cocos-editor.mjs" --project "<工程目录>" --timeout 60000 preview db://assets/ui/example.prefab temp/cocos-prefab-preview/example.png
 ```
 
+在扩展管理器中启用桥接后，调用 Creator 顶部菜单 `开发者 -> 重新加载`。以后导入 Creator 编辑器插件，或修改已安装插件的代码和配置后，也必须调用该重新加载功能并等待桥接重新就绪；不要用重启 Creator 代替，也不要只刷新扩展管理器。修改 AssetDB 管理的工程资源（`db://assets/...`）只需等待资源导入完成，不重新加载编辑器，也不重启工程。
+
 脚本会检查 `package.json` 中的 Creator 版本。桥接服务只监听 `127.0.0.1`，连接信息和一次性令牌保存在目标工程的 `temp` 目录。
 
 ## 安全约束

@@ -25,8 +25,8 @@ description: 安装并使用本地认证桥接扩展，通过 Cocos Creator 3.8 
    node "<技能根目录>/control-cocos-editor/scripts/install-bridge.mjs" --project "<工程目录>"
    ```
 
-4. 在 Creator 的扩展管理器中刷新并启用 `cocos3-codex-bridge`。
-5. 检查连接：
+4. 在 Creator 的扩展管理器中启用 `cocos3-codex-bridge`，然后调用 Creator 顶部菜单的 `开发者 -> 重新加载`。导入 Creator 编辑器插件，或修改已安装插件的代码和配置后，都必须再次调用该重新加载功能；不要用重启 Creator 代替，也不要只刷新扩展管理器。修改 AssetDB 管理的工程资源（`db://assets/...`）不执行此步骤，也不重启工程，只等待资源导入完成。
+5. 等待 Creator 界面重新加载完成，再检查连接：
 
    ```powershell
    node "<技能根目录>/control-cocos-editor/scripts/cocos-editor.mjs" --project "<工程目录>" status
@@ -81,6 +81,8 @@ node "<技能根目录>/control-cocos-editor/scripts/cocos-editor.mjs" --project
 
 - 启动或重新启动工程时使用 `cocoscreator --project "<工程目录>"`。
 - 同一个工程最多运行一个 Creator 实例；启动前检查现有实例，已打开时直接复用。重启时必须先完全关闭旧实例。
+- 导入 Creator 编辑器插件，或修改插件代码和配置后，调用顶部菜单 `开发者 -> 重新加载`，再等待桥接重新就绪；这属于编辑器内重新加载，不是关闭并重启 Creator。
+- 修改 AssetDB 管理的工程资源（`db://assets/...`）后只等待 AssetDB idle；不要因此重新加载编辑器或重启工程。
 - 修改前先查询目标 UUID、当前属性和 Prefab 状态。
 - 优先使用 `scene` 消息执行修改，以进入 Creator 撤销记录。
 - 仅在公开消息无法表达操作时使用 Scene Script 修改方法。
