@@ -6,6 +6,8 @@
 - Give every layout, renderer, mask, or interactive UI node a `UITransform`.
 - Use hierarchy sibling order for draw order. `UITransform.priority` is deprecated.
 - Prefer nested Prefabs for repeated controls and panels. Do not nest a Prefab inside itself.
+- Group related headings, backgrounds, content, and controls under semantic functional-region nodes; do not leave all leaf nodes flat under the page or panel root.
+- Put every visible button text Label inside its corresponding Button node, normally as a direct child; never keep a Button and its text Label as siblings.
 
 ## Geometry and adaptation
 

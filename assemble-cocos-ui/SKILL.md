@@ -34,6 +34,8 @@ description: 根据自然语言、UI 效果图、现有 Cocos Creator 3.8 Prefab
    - 已提供或能在工程中唯一定位对应资源：精确资源模式。
    - 对应资源缺失：纯色占位模式。
 5. 按“根与控制边界 → 嵌套 Prefab → 功能容器 → 固定槽位与模板 → 叶子节点”的顺序规划。节点规格表是尺寸、位置、锚点、激活状态和组件属性的唯一事实来源；树只表达父子关系、渲染顺序、来源和组件概览。
+   - 不要把一个功能区域的标题、背景、内容和控件全部平铺到页面根或面板根。两个及以上同职责节点应归入语义明确的区域容器，但不得破坏已有脚本路径、动画轨道或 Prefab 实例边界。
+   - 按钮可见文字必须放在对应 Button 节点的子树内，通常作为直接子 Label；不得让按钮与其文字成为同级节点。
 6. 使用蓝图模板输出：分析摘要、结构证据、完整节点树、控制器和引用作用域、Prefab 实例、关键规格、重复内容、状态、视觉、交互、适配、拼装顺序及待确认项。
 7. 执行蓝图一致性检查：
    - 本地节点路径唯一，父路径存在，命名遵循目标工程。
@@ -60,7 +62,7 @@ description: 根据自然语言、UI 效果图、现有 Cocos Creator 3.8 Prefab
     - 最后配置 Widget、项目交互组件、ScrollView 和必要的 EventHandler。
 12. 恢复运行时契约：刷新节点收集器，核对按钮路由、Switch 默认状态、滚动 Content、模板显隐、动画路径、排序边界和业务组件引用。不要批量激活原本用于状态、模板或特效的禁用节点。
 13. 从内层到外层调用 `Layout.updateLayout()` 和 `Widget.updateAlignment()`，再重新测量尺寸、边界和点击区域。
-14. 运行 UI 校验。独立 Prefab 根本来不含 Canvas，使用 `assumeRenderRoot`：
+14. 运行结构与运行时契约校验。`validateUI` 只检查组件、层级、引用和基础 UI 约束，不读取效果图，也不验证视觉位置；其 0 error/0 warning 只能称为“结构校验通过”，不得称为“界面验收通过”。独立 Prefab 根本来不含 Canvas，使用 `assumeRenderRoot`：
 
    ```powershell
    node "<技能根目录>/control-cocos-editor/scripts/cocos-editor.mjs" --project "<工程目录>" request scene-script validateUI '["<根节点UUID>",{"assumeRenderRoot":true}]'
@@ -73,6 +75,7 @@ description: 根据自然语言、UI 效果图、现有 Cocos Creator 3.8 Prefab
 
 16. 有效果图时，用 `cocos-prefab-preview` 或 `capture-cocos-runtime` 在相同像素尺寸和内容状态下生成真实 PNG，并查看叠图和差异图。
    - 在比较整图前先逐个核对所有 Label 的实际可见包围框、首字左边界、文本基线、字号、行高、字重和描边；不能只检查 Label 节点中心或 `UITransform` 矩形。
+   - 对标题等关键文字记录参考图与真实渲染图的字形 `left/top/right/bottom`；没有这组对照数据时，不能报告文字位置已通过验收。
    - 任何文字节点的位置、字号或描边与效果图明显不符时，不得把视觉验收判定为完成。
 17. 全部可见元素都有对应美术资源时执行严格比较。差异像素不为 0 就继续定位并迭代。
 18. 存在缺失美术资源时，精确还原已有资源、文字和几何；只允许缺失资源对应节点保持纯色大致效果。交付时列出这些节点，不能将结果描述为与效果图完全一致。
@@ -107,7 +110,7 @@ python "<技能根目录>/assemble-cocos-ui/scripts/compare-ui-images.py" --refe
 - 业务脚本需要的节点名、组件和引用可解析，收集器作用域内没有重复 key。
 - 交互使用工程既有组件和分发方式，点击区域不小于视觉区域，没有重复触发路径。
 - Layout、Widget、Mask、ScrollView、Switch、动画、排序边界、嵌套 Prefab 和初始状态经过校验。
-- 保存后的 Prefab 能重新打开，UI 校验无 error，关键 warning 有明确解释。
+- 保存后的 Prefab 能重新打开，结构校验无 error，关键 warning 有明确解释；此结果不代表视觉验收通过。
 - 提供了全部对应美术资源时，真实渲染图与效果图尺寸、内容状态和 RGBA 像素完全相同，`mismatchPixels = 0`。
 - 缺少部分或全部美术资源时，只有对应元素使用纯色 Sprite；界面结构、尺寸、位置、文字、交互和已有素材已验收，并列出纯色节点及待替换资源。
 

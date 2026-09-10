@@ -92,6 +92,8 @@ DialogRoot
 - 仅为视觉对齐产生的空父节点。
 - 已有公共 Prefab 的内部结构；在当前蓝图中将其作为实例处理。
 
+页面根或面板根只保留全局背景、独立浮层以及主要功能区域。账号信息、设置项、操作区、页脚等包含多个同职责节点的内容应各自进入语义明确的容器，避免叶子节点完全平铺。分组前先检查脚本路径、AnimationClip 和 Prefab 覆盖；这些契约存在时同步迁移引用或保留原路径。
+
 ## 组件选择
 
 先遵循目标工程的自定义组件，再使用对应的 Cocos 内置组件。
@@ -140,7 +142,7 @@ ConfirmButton [UITransform, ProjectButton]
 └── ButtonLabel [UITransform, Label]
 ```
 
-说明热区、Transition、normal/pressed/disabled 视觉、事件归属和按钮稳定名称。需要扩热区时扩大按钮根节点，不拉伸视觉子节点。
+按钮文字必须位于对应 Button 节点的子树中，通常使用直接子节点 `ButtonLabel`；不得把按钮文字作为 Button 的同级节点。说明热区、Transition、normal/pressed/disabled 视觉、事件归属和按钮稳定名称。需要扩热区时扩大按钮根节点，不拉伸视觉子节点。
 
 ### ScrollView
 
