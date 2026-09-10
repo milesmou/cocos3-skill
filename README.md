@@ -142,6 +142,7 @@ cocos-skill/
 - 可用的 `cocoscreator` 命令
 - 同一个工程最多运行一个 Creator 实例；启动前先检查，已打开时复用现有实例
 - Node.js 18 或更高版本
+- Python 3.10 或更高版本及 Pillow（仅 `assemble-cocos-ui` 的严格效果图比较需要）
 - 目标工程必须包含有效的 `package.json` 和 `assets` 目录
 
 在线控制前，先确认目标工程没有已运行的 Creator 实例。工程已打开时直接复用，禁止重复启动；工程未打开时使用 `cocoscreator --project "<工程目录>"` 启动。需要重启时，先完全关闭旧实例，再执行启动命令。然后在目标工程安装并启用桥接扩展：

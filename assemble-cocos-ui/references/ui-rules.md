@@ -20,13 +20,22 @@
 - A non-sprite `Mask` requires its generated `Graphics` component.
 - A `SPRITE_STENCIL` Mask requires `Sprite` and a SpriteFrame.
 - Do not put Label, RichText, Sprite, or another renderer on a Mask node, except the Sprite required by `SPRITE_STENCIL`.
-- Assign `ScrollView.view` and `ScrollView.content`; make content a descendant of view. Put the Mask on the view node.
+- Always assign `ScrollView.content`. Prefer an explicit `ScrollView.view`, make content its descendant, and put the Mask on the view node.
+- Some established projects omit the serialized `view` and use the Mask-bearing `content.parent` as the effective viewport. Preserve that structure when it is already the project convention; require content to remain below that Mask and do not add a redundant viewport only to silence a warning.
 
 ## Interaction
 
 - Set Button/Toggle transition target and state assets after the visual hierarchy exists.
 - Bind serialized EventHandlers last. Verify target node, registered component class, method name, and custom event data.
+- Before adding a serialized EventHandler, check whether the project's UI base class already routes clicks by button name or runtime listeners. Use one dispatch path for the same action.
 - Add `BlockInputEvents` to modal blockers when clicks must not pass through; its node needs a correctly sized `UITransform`.
+
+## Placeholder visuals
+
+- Use a solid-color Sprite only when the corresponding art resource was not provided or cannot be uniquely identified in the project.
+- Use a neutral white SpriteFrame tinted with `Sprite.color`; do not use patterned defaults, similar artwork, or cropped pieces of the reference image as substitutes.
+- Keep each placeholder on the node that will receive the final asset, preserve its measured size and anchor, and report every placeholder at handoff.
+- Never replace supplied or explicitly selected art with a placeholder.
 
 ## Official references
 

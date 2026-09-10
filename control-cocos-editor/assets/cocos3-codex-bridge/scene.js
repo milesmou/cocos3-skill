@@ -135,6 +135,15 @@ function componentOfType(node, type) {
   }) || null;
 }
 
+function scrollViewViewport(scrollView) {
+  if (scrollView?.view) return { node: scrollView.view, source: 'explicit' };
+  const contentParent = scrollView?.content?.parent || null;
+  if (contentParent && hasType(contentParent, 'Mask')) {
+    return { node: contentParent, source: 'content-parent' };
+  }
+  return { node: null, source: null };
+}
+
 function assetUuid(asset) {
   return asset?._uuid || asset?.uuid || null;
 }
@@ -183,7 +192,11 @@ function summarizeUI(node, depth, maxDepth) {
       if ('spriteFrame' in component) item.spriteFrame = assetUuid(component.spriteFrame);
       if ('font' in component) item.font = assetUuid(component.font);
       if ('content' in component) item.content = component.content?.uuid || null;
-      if ('view' in component) item.view = component.view?.uuid || null;
+      if ('view' in component) {
+        const viewport = scrollViewViewport(component);
+        item.view = viewport.node?.uuid || null;
+        item.viewSource = viewport.source;
+      }
       return item;
     })
   };
@@ -228,9 +241,10 @@ function validateUIRoot(root, options = {}) {
       if (!spriteStencil && !hasType(node, 'Graphics')) push('error', 'mask-missing-graphics', node, 'non-sprite Mask requires Graphics');
     }
     if (scrollView) {
+      const viewport = scrollViewViewport(scrollView);
       if (!scrollView.content) push('error', 'scroll-view-missing-content', node, 'ScrollView content is not assigned');
-      if (!scrollView.view) push('warning', 'scroll-view-missing-view', node, 'ScrollView view is not assigned');
-      if (scrollView.content && scrollView.view && !scrollView.content.isChildOf(scrollView.view)) {
+      if (!viewport.node) push('warning', 'scroll-view-missing-view', node, 'ScrollView view is not assigned and content.parent is not a Mask viewport');
+      if (scrollView.content && viewport.node && !scrollView.content.isChildOf(viewport.node)) {
         push('error', 'scroll-view-content-outside-view', node, 'ScrollView content must be a descendant of its view');
       }
     }
