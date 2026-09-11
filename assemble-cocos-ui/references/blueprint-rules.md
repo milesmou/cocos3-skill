@@ -131,7 +131,7 @@ Sprite 规则：
 - 人物、图标、文字纹理和复杂装饰保持比例。
 - 已提供或可唯一定位的资源写出 `db://` 来源；缺少对应资源时才使用纯色 Sprite 占位，并标记为近似效果。
 
-Label 至少说明文字或占位、UITransform 尺寸与锚点、FontSize、LineHeight、颜色、水平对齐、垂直对齐、Overflow、描边、阴影、自动缩小、多行和动态更新。描边使用 Label 自身的 `enableOutline`、`outlineColor`、`outlineWidth`，不规划或添加独立 `LabelOutline` 组件。对齐方式必须符合语义：居中标题和按钮文字以目标视觉区域中心定位，左对齐正文以文本起始边定位；不得用错误的对齐方式加节点偏移来凑字形位置。无法识别文案时使用语义占位，不虚构业务文本。
+Label 至少说明文字或占位、UITransform 尺寸与锚点、FontSize、LineHeight、颜色、字体来源、字体族、水平对齐、垂直对齐、Overflow、描边、阴影、自动缩小、多行和动态更新。先在工程中查找符合效果图的字体资源；找不到时规划为系统字体，设置 `useSystemFont = true`，并将 `fontFamily` 固定为 `Arial`。使用字体资源时不套用此规则。描边使用 Label 自身的 `enableOutline`、`outlineColor`、`outlineWidth`，不规划或添加独立 `LabelOutline` 组件。对齐方式必须符合语义：居中标题和按钮文字以目标视觉区域中心定位，左对齐正文以文本起始边定位；不得用错误的对齐方式加节点偏移来凑字形位置。无法识别文案时使用语义占位，不虚构业务文本。
 
 ## 复合控件
 

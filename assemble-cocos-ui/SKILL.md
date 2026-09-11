@@ -1,6 +1,6 @@
 ---
 name: assemble-cocos-ui
-description: 根据自然语言、UI 效果图、现有 Cocos Creator 3.8 Prefab、控制脚本或节点蓝图，分析工程结构并生成可执行的 Prefab 蓝图；按用户意图只交付规划，或继续通过 Creator 编辑器拼装、重构和验收 UI。提供对应美术资源时迭代到与效果图完全一致，缺少对应资源时只用纯色 Sprite 拼装大致效果。
+description: 根据自然语言、UI 效果图、现有 Cocos Creator 3.8 Prefab、控制脚本或节点蓝图，规划、拼装、重构、替换正式美术资源并验收 UI。提供对应美术资源时迭代到与效果图完全一致，缺少对应资源时只用纯色 Sprite 拼装大致效果，同时保留后续安全换装所需的节点和几何契约。
 ---
 
 # 规划与拼装 Cocos UI
@@ -11,10 +11,11 @@ description: 根据自然语言、UI 效果图、现有 Cocos Creator 3.8 Prefab
 
 - 用户只要求“分析、规划、节点树、蓝图”时，只完成规划阶段并交付蓝图，不修改工程。
 - 用户要求“创建、制作、拼装、实现、重构、修复”时，先补全或校验蓝图，再在同一任务中继续执行和验收；已有制作授权时不额外等待确认。
+- 用户要求给已经拼装的 UI“补资源、换正式图、替换美术、换皮”时，保留现有功能结构，只执行与新资源有关的必要修改，并完成换装回归；不要重新按首次拼装流程创建界面。
 - 用户给出完整蓝图时仍先检查工程契约。发现与脚本、资源或现有 Prefab 冲突时，按证据修正规格并记录原因。
 - 只有会改变结构且无法合理推断的必要信息缺失时才询问用户。其余未知项标记为“待确认”或带依据的“估算”，继续不依赖该信息的工作。
 
-始终读取 [references/blueprint-rules.md](references/blueprint-rules.md) 和 [references/ui-rules.md](references/ui-rules.md)。需要输出蓝图时使用 [references/blueprint-template.md](references/blueprint-template.md)。目标为 MyCookingGirl，或工程包含 `cocos3-toolkit` 的 `ReferenceCollector`、`MButton` 等组件时，还要读取 [references/my-cooking-girl-prefab-structure.md](references/my-cooking-girl-prefab-structure.md) 和 [references/my-cooking-girl-ui.md](references/my-cooking-girl-ui.md)。输入包含效果图时必须读取 [references/visual-fidelity.md](references/visual-fidelity.md)。
+始终读取 [references/blueprint-rules.md](references/blueprint-rules.md) 和 [references/ui-rules.md](references/ui-rules.md)。需要输出蓝图时使用 [references/blueprint-template.md](references/blueprint-template.md)。目标为 MyCookingGirl，或工程包含 `cocos3-toolkit` 的 `ReferenceCollector`、`MButton` 等组件时，还要读取 [references/my-cooking-girl-prefab-structure.md](references/my-cooking-girl-prefab-structure.md) 和 [references/my-cooking-girl-ui.md](references/my-cooking-girl-ui.md)。输入包含效果图时必须读取 [references/visual-fidelity.md](references/visual-fidelity.md)。已有 UI 需要补充或替换正式美术、字体、状态图或嵌套视觉 Prefab 时，必须读取并执行 [references/art-replacement.md](references/art-replacement.md)。
 
 命令中的 `<技能根目录>` 替换为本技能集合所在目录的绝对路径，`<工程目录>` 替换为目标 Cocos 工程绝对路径；保留路径引号，不依赖当前工作目录。
 
@@ -50,6 +51,8 @@ description: 根据自然语言、UI 效果图、现有 Cocos Creator 3.8 Prefab
 
 用户只要求分析或规划时，到此交付蓝图并结束。用户要求实际制作时继续执行以下阶段。
 
+已有 UI 只需替换美术资源时，不重新创建根节点或功能结构。先按 [references/art-replacement.md](references/art-replacement.md) 固定换装前基线和替换清单，再复用下面的结构校验、保存和视觉验收步骤。
+
 ## 拼装阶段
 
 8. 连接 `control-cocos-editor`，按需组合 `inspect-cocos-content`、`manage-cocos-node`、`manage-cocos-components`、`manage-cocos-assets`、`manage-cocos-prefab-instance` 和 `manage-cocos-event-handlers`。等待编辑器就绪，确认当前编辑的是目标场景或 Prefab，保存用户已有上下文，并用 `inspectUILayout` 记录基线。
@@ -58,7 +61,7 @@ description: 根据自然语言、UI 效果图、现有 Cocos Creator 3.8 Prefab
 11. 按以下顺序配置：
     - 未指定 Layer 时，将新建 Prefab 根和自建后代设置为 `UI_2D`（`33554432`）；不要改写嵌套 Prefab 内部节点。
     - 添加 `UITransform`，先根据元素与父容器的定位关系确定尺寸和锚点，再计算节点局部坐标；不能使用默认锚点计算后再改锚点。
-    - 添加 Sprite、Label、Mask 等视觉组件并绑定资源。Label 必须在定位前明确水平对齐、垂直对齐和 Overflow；不能用错误的对齐方式配合节点偏移来补偿字形位置。文字描边只设置 Label 自身的 `enableOutline`、`outlineColor` 和 `outlineWidth`，不得添加独立 `LabelOutline` 组件。正式资源必须原样使用。只有缺少对应资源的元素才使用中性纯白 SpriteFrame 配合 `Sprite.color` 形成纯色块，按效果图的大致轮廓、尺寸和层次拼装。
+    - 添加 Sprite、Label、Mask 等视觉组件并绑定资源。Label 必须在定位前明确水平对齐、垂直对齐和 Overflow；不能用错误的对齐方式配合节点偏移来补偿字形位置。先在工程中查找符合效果图的字体资源；找不到时改用系统字体，设置 `useSystemFont = true`，并将 `fontFamily` 固定为 `Arial`。使用字体资源时不套用此规则。文字描边只设置 Label 自身的 `enableOutline`、`outlineColor` 和 `outlineWidth`，不得添加独立 `LabelOutline` 组件。正式资源必须原样使用。只有缺少对应资源的元素才使用中性纯白 SpriteFrame 配合 `Sprite.color` 形成纯色块，按效果图的大致轮廓、尺寸和层次拼装。
     - 设置子节点尺寸，再配置父容器 Layout。
     - 最后配置 Widget、项目交互组件、ScrollView 和必要的 EventHandler。
 12. 恢复运行时契约：刷新节点收集器，核对按钮路由、Switch 默认状态、滚动 Content、模板显隐、动画路径、排序边界和业务组件引用。不要批量激活原本用于状态、模板或特效的禁用节点。

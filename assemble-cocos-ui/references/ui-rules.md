@@ -37,6 +37,7 @@
 
 ## Text decoration
 
+- Look for a project font asset that matches the reference artwork. If none exists, use the system font by setting `Label.useSystemFont` to `true` and `Label.fontFamily` to `Arial`. This rule does not apply when the Label uses a font asset.
 - Use `Label.isUnderline` for underlined text. Do not draw a text underline with a Sprite, Graphics, or a separate line node.
 - When only part of a sentence is underlined, split it into separately aligned Label nodes so only the linked phrases enable `isUnderline`.
 - Configure text outlines only through `Label.enableOutline`, `Label.outlineColor`, and `Label.outlineWidth`. Do not add a separate `LabelOutline` component.
@@ -46,6 +47,7 @@
 - Use a solid-color Sprite only when the corresponding art resource was not provided or cannot be uniquely identified in the project.
 - Use a neutral white SpriteFrame tinted with `Sprite.color`; do not use patterned defaults, similar artwork, or cropped pieces of the reference image as substitutes.
 - Keep each placeholder on the node that will receive the final asset, preserve its measured size and anchor, and report every placeholder at handoff.
+- Record the target node or component UUID, intended final asset, geometry strategy, and every button/state/dynamic use so later replacement does not depend on names or the currently visible state.
 - Never replace supplied or explicitly selected art with a placeholder.
 
 ## Official references
