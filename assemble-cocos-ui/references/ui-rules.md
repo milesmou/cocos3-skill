@@ -17,6 +17,7 @@
 - For every Label, set horizontal alignment, vertical alignment, overflow, and UITransform size before positioning it. Do not offset a node to compensate for an incorrect text-alignment mode.
 - Treat Widget-controlled position or size axes as derived values. Do not also animate or manually maintain those axes.
 - Use project settings for design resolution and fit mode; do not encode a second design resolution in the Prefab.
+- When the reference aspect ratio differs from the project design resolution, reconstruct the runtime logical canvas before converting coordinates: portrait width-fit uses the reference width, landscape height-fit uses the reference height, and the design root is centered inside that logical canvas. Never compress the reference's long axis into the design resolution.
 - Configure child sizes before enabling `Layout`. Choose `NONE`, `CHILDREN`, or `CONTAINER` resize mode intentionally.
 - After bulk edits, call `Layout.updateLayout()` and `Widget.updateAlignment()` through `scene.execute-component-method` before measuring bounds.
 

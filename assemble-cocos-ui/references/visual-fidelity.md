@@ -24,6 +24,39 @@
 
 参考图和实测图必须使用同一个基线。尺寸、语言、数据或动画帧不同的两张图不能进入像素比较。
 
+### 宽高比不同的适配坐标系
+
+效果图宽高比与工程设计分辨率不一致时，必须先复现项目的适配轴，再测量和拼装。不得把效果图直接缩放、压缩或裁切成设计分辨率：
+
+- 竖屏游戏采用宽度适配时，以设计宽度除以效果图宽度得到缩放系数；逻辑画布高度等于效果图高度乘该系数。
+- 横屏游戏采用高度适配时，以设计高度除以效果图高度得到缩放系数；逻辑画布宽度等于效果图宽度乘该系数。
+- 设计根按项目运行时行为在适配后的逻辑画布中居中。先将效果图坐标换算到逻辑画布，再减去设计根相对逻辑画布的居中偏移，最后换算成根节点局部坐标。
+- 效果图中的额外长边区域属于真实可见画布，不得当作截图误差删除；背景、遮罩或安全区是否覆盖这些区域由项目适配契约决定。
+
+竖屏宽度适配示例：效果图为 `referenceWidth × referenceHeight`，设计分辨率为 `designWidth × designHeight`：
+
+```text
+scale = designWidth / referenceWidth
+logicalWidth = designWidth
+logicalHeight = referenceHeight * scale
+rootOffsetX = (logicalWidth - designWidth) / 2
+rootOffsetY = (logicalHeight - designHeight) / 2
+
+logicalLeft = referenceLeft * scale
+logicalTop = referenceTop * scale
+rootLeft = logicalLeft - rootOffsetX
+rootTop = logicalTop - rootOffsetY
+```
+
+横屏高度适配时交换宽高和 X/Y 角色。根与节点均为中心锚点时，再由根内左上坐标换算 Cocos 局部坐标：
+
+```text
+x = rootLeft + width / 2 - designWidth / 2
+y = designHeight / 2 - (rootTop + height / 2)
+```
+
+如果 Prefab 静态预览仅改变输出 Canvas 尺寸，却没有复现运行时对设计根的缩放和居中，不得把该裁切结果与效果图进行像素比较。此时必须使用实际运行时截图，或先验证预览器确实产生了相同的逻辑画布、根偏移和裁剪行为。
+
 ## 从图像建立可执行规格
 
 按从外到内的顺序测量画布、全屏背景、主面板、功能区域、重复项和叶子视觉。对每个可见元素记录：
