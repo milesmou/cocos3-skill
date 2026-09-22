@@ -16,7 +16,7 @@ description: 根据自然语言、UI 效果图、现有 Cocos Creator 3.8 Prefab
 - 只有会改变结构且无法合理推断的必要信息缺失时才询问用户。其余未知项标记为“待确认”或带依据的“估算”，继续不依赖该信息的工作。
 
 始终读取 [references/blueprint-rules.md](references/blueprint-rules.md) 和 [references/ui-rules.md](references/ui-rules.md)。需要输出蓝图时使用 [references/blueprint-template.md](references/blueprint-template.md)。目标为 MyCookingGirl，或工程包含 `cocos3-toolkit` 的 `ReferenceCollector`、`MButton` 等组件时，还要读取 [references/my-cooking-girl-prefab-structure.md](references/my-cooking-girl-prefab-structure.md) 和 [references/my-cooking-girl-ui.md](references/my-cooking-girl-ui.md)。输入包含效果图时必须读取 [references/visual-fidelity.md](references/visual-fidelity.md)。已有 UI 需要补充或替换正式美术、字体、状态图或嵌套视觉 Prefab 时，必须读取并执行 [references/art-replacement.md](references/art-replacement.md)。
-涉及生图、切图、合图或从效果图拆分 SpriteFrame 时，还必须读取并执行 [references/art-slicing.md](references/art-slicing.md)。
+涉及生图、切图、合图或从效果图拆分 SpriteFrame 时，还必须读取并执行 [references/art-slicing.md](references/art-slicing.md)。必须在生图或切图之前依据效果图和项目设计分辨率确定每个素材的正式输出像素尺寸、透明留白及锚点/接口位置，并写入素材规格表；未确定不得开始制作。随后按规格输出 PNG、核对实际文件尺寸，再导入 Creator。禁止生成后临时决定正式尺寸，或直接导入大尺寸制作源图，仅靠节点缩放满足显示尺寸。
 
 命令中的 `<技能根目录>` 替换为本技能集合所在目录的绝对路径，`<工程目录>` 替换为目标 Cocos 工程绝对路径；保留路径引号，不依赖当前工作目录。
 
@@ -52,7 +52,7 @@ description: 根据自然语言、UI 效果图、现有 Cocos Creator 3.8 Prefab
    - 已提供或能在工程中唯一定位对应资源：精确资源模式。
    - 对应资源缺失：纯色占位模式。
    - 效果图宽高比与工程设计分辨率不一致时，先按项目实际适配轴建立逻辑画布：竖屏宽度适配按宽度等比换算，横屏高度适配按高度等比换算。设计根在逻辑画布中居中后，再把效果图坐标换算成根节点局部坐标；不得直接把效果图高度压缩或裁切到工程设计高度。
-   - 需要生图或切图时，先为每个素材建立“真实尺寸契约”：记录来源图像素尺寸、切片矩形（含透明留白）、输出像素宽高、设计分辨率下的目标 UITransform 宽高和 Sprite 渲染模式。切片矩形必须由真实包围框和适配缩放计算得到，不得凭目测或先把整张图缩放后再猜边界。
+   - 需要生图或切图时，在任何制作操作之前按 [真实尺寸切图规则](references/art-slicing.md) 完成素材规格表，明确正式输出尺寸及其计算依据。生图尚无来源图时先记录计划制作画布尺寸；生成后核对实际来源尺寸，按已确定的规格输出，不能反过来用生成结果决定正式尺寸。切片矩形必须由真实包围框和适配缩放计算得到，不得凭目测或先把整张图缩放后再猜边界。
 5. 按“根与控制边界 → 嵌套 Prefab → 功能容器 → 固定槽位与模板 → 叶子节点”的顺序规划。节点规格表是尺寸、位置、锚点、激活状态和组件属性的唯一事实来源；树只表达父子关系、渲染顺序、来源和组件概览。
    - 不要把一个功能区域的标题、背景、内容和控件全部平铺到页面根或面板根。两个及以上同职责节点应归入语义明确的区域容器，但不得破坏已有脚本路径、动画轨道或 Prefab 实例边界。
    - 按钮可见文字必须放在对应 Button 节点的子树内，通常作为直接子 Label；不得让按钮与其文字成为同级节点。
