@@ -5,7 +5,7 @@
 ## 工程基准
 
 - Creator 版本为 3.8.8。
-- 设计分辨率是 750 × 1334，`fitWidth: true`、`fitHeight: false`。
+- 设计分辨率和适配开关以当前 `settings/v2/packages/project.json` 的 `general.designResolution` 为准，按 [快速读取流程](../../inspect-cocos-content/SKILL.md#快速获取工程设计分辨率) 获取，不使用样本尺寸代替配置。
 - 52 个窗口 Prefab 的根节点为 750 × 1334；小控件和列表项保留自身尺寸。不要把所有 Prefab 都强制改成全屏。
 - Prefab 根节点名与文件名一致。根节点通常挂 `UITransform`、业务控制组件和 `ReferenceCollector`，部分窗口另有 `Animation` 或 `UIOpacity`。
 - 展开的 UI 节点使用 `UI_2D`。离线读取时，嵌套 Prefab 的根存根可能只有父节点和 Prefab 信息，不能因此判定它缺少 `UITransform` 或 Layer。

@@ -5,7 +5,7 @@
 ## 工程与样本概况
 
 - Creator 版本：3.8.8。
-- 设计分辨率：750 × 1334，`fitWidth: true`、`fitHeight: false`。
+- 设计分辨率和适配开关以当前 `settings/v2/packages/project.json` 的 `general.designResolution` 为准，按 [快速读取流程](../../inspect-cocos-content/SKILL.md#快速获取工程设计分辨率) 获取，不使用样本尺寸代替配置。
 - 样本：77 个 Prefab、3393 个序列化 Node。
 - 层级深度：中位数 5，最大 11。结构允许为控制器、裁剪、状态和复用增加必要层级，不追求统一的浅树。
 - 52 个 Prefab 根节点尺寸为 750 × 1334；其余是列表项、战斗节点、货币栏或小型控件，保留自身尺寸。
@@ -17,7 +17,7 @@
 - 全屏窗口常见结构是根控制器下放置 `home`。弹窗还会在 `home` 前放置 `fullCoseBtn`、`BtnCloseFull`、`BtnClose` 或同类外部点击区。
 - 一级关闭热区是否存在、名称和渲染顺序必须参考同目录 Prefab 与控制脚本，不统一改名。
 - `UIAvg`、`UIGuide`、`UIGameFailReason`、`UIDress` 和 Loading 等职责特殊的窗口没有标准 `home` 结构，证明 `home` 不是硬性模板。
-- 全屏根默认使用 750 × 1334。小控件不得被扩成全屏根。
+- 新建全屏根使用当前工程配置的设计分辨率；样本中的 750 × 1334 是历史尺寸。小控件不得被扩成全屏根。
 
 推荐按职责选择参考：
 

@@ -41,7 +41,7 @@ description: 根据自然语言、UI 效果图、现有 Cocos Creator 3.8 Prefab
 1. 收集证据。
    - 读取用户提示、效果图尺寸、可见内容、资源范围、目标 Prefab 和控制脚本。
    - 有现成 Prefab 时，使用 `inspect-cocos-content` 或 `control-cocos-editor` 查询真实层级、组件、激活状态、资源和 Prefab 实例，不凭截图或文件名推断。
-   - 读取工程设计分辨率、适配设置和同业务目录内容，从同职责 Prefab 中选择 1 至 3 个结构参考。不要把全工程统计直接当作单个界面的模板。
+   - 按 [inspect-cocos-content 的快速获取工程设计分辨率流程](../inspect-cocos-content/SKILL.md#快速获取工程设计分辨率) 直接读取当前工程配置及适配设置，再读取同业务目录内容，从同职责 Prefab 中选择 1 至 3 个结构参考。不要把全工程统计直接当作单个界面的模板。
 2. 判断 Prefab 职责：全屏窗口、弹窗、HUD、可复用控件、列表项、状态节点或纯视觉特效。由职责决定根尺寸、控制器、内容容器和适配方式。
 3. 提取结构契约。
    - 标出根控制组件和每个嵌套控制器、`ReferenceCollector` 或同类收集器的作用域。
