@@ -1,6 +1,6 @@
 # 效果图一致性与纯色占位验收
 
-输入包含效果图时，本参考是强制流程。目标是在效果图对应的分辨率和内容状态下还原界面，同时保持界面可交互、可维护并符合工程运行时契约。美术资源是否提供决定视觉元素的验收方式。
+输入包含效果图时，本参考是强制流程。目标是在工程设计分辨率和效果图对应的内容状态下还原界面，同时保持界面可交互、可维护并符合工程运行时契约。美术资源是否提供决定视觉元素的验收方式。
 
 ## 资源模式判定
 
@@ -24,38 +24,32 @@
 
 参考图和实测图必须使用同一个基线。尺寸、语言、数据或动画帧不同的两张图不能进入像素比较。
 
-### 宽高比不同的适配坐标系
+### 直接使用工程设计分辨率
 
-效果图宽高比与工程设计分辨率不一致时，必须先复现项目的适配轴，再测量和拼装。不得把效果图直接缩放、压缩或裁切成设计分辨率：
+拼装画布直接取工程配置的 `designWidth × designHeight`，全屏 UI 根节点尺寸与其一致。弹窗和可复用控件保留自身尺寸，但位置和尺寸均使用工程设计坐标。工程 fit 设置用于运行时设备适配，不用于按效果图比例扩展拼装画布。
 
-- 竖屏游戏采用宽度适配时，以设计宽度除以效果图宽度得到缩放系数；逻辑画布高度等于效果图高度乘该系数。
-- 横屏游戏采用高度适配时，以设计高度除以效果图高度得到缩放系数；逻辑画布宽度等于效果图宽度乘该系数。
-- 设计根按项目运行时行为在适配后的逻辑画布中居中。先将效果图坐标换算到逻辑画布，再减去设计根相对逻辑画布的居中偏移，最后换算成根节点局部坐标。
-- 效果图中的额外长边区域属于真实可见画布，不得当作截图误差删除；背景、遮罩或安全区是否覆盖这些区域由项目适配契约决定。
-
-竖屏宽度适配示例：效果图为 `referenceWidth × referenceHeight`，设计分辨率为 `designWidth × designHeight`：
+保留原始效果图；尺寸不同时，以宽高比例中的较小值作为统一缩放系数，将整张效果图等比缩放并居中放入设计画布，完整显示所有内容。不得裁切、分别缩放两个轴或为填满画布而放大溢出。记录缩放系数和留白偏移，并生成独立的设计分辨率参考副本用于比较：
 
 ```text
-scale = designWidth / referenceWidth
-logicalWidth = designWidth
-logicalHeight = referenceHeight * scale
-rootOffsetX = (logicalWidth - designWidth) / 2
-rootOffsetY = (logicalHeight - designHeight) / 2
-
-logicalLeft = referenceLeft * scale
-logicalTop = referenceTop * scale
-rootLeft = logicalLeft - rootOffsetX
-rootTop = logicalTop - rootOffsetY
+scale = min(designWidth / referenceWidth, designHeight / referenceHeight)
+offsetX = (designWidth - referenceWidth * scale) / 2
+offsetY = (designHeight - referenceHeight * scale) / 2
+designLeft = offsetX + referenceLeft * scale
+designTop = offsetY + referenceTop * scale
+designRegionWidth = referenceWidthOfElement * scale
+designRegionHeight = referenceHeightOfElement * scale
 ```
 
-横屏高度适配时交换宽高和 X/Y 角色。根与节点均为中心锚点时，再由根内左上坐标换算 Cocos 局部坐标：
+所有内容的位置、尺寸、间距、字号和行高均使用同一缩放系数，保持原图比例和相对布局。剩余区域保留留白，并记录填充颜色或透明背景；参考副本和实际渲染使用相同填充。不得通过重排、拉伸或裁切原图内容消除留白。
+
+根与节点均为中心锚点时，由设计画布内左上坐标换算全屏根的局部坐标：
 
 ```text
-x = rootLeft + width / 2 - designWidth / 2
-y = designHeight / 2 - (rootTop + height / 2)
+x = designLeft + width / 2 - designWidth / 2
+y = designHeight / 2 - (designTop + height / 2)
 ```
 
-如果 Prefab 静态预览仅改变输出 Canvas 尺寸，却没有复现运行时对设计根的缩放和居中，不得把该裁切结果与效果图进行像素比较。此时必须使用实际运行时截图，或先验证预览器确实产生了相同的逻辑画布、根偏移和裁剪行为。
+其他锚点或嵌套容器按实际父节点尺寸、锚点和位置换算。预览与参考副本均使用工程设计分辨率；其他设备尺寸的运行时适配单独验收，不改变拼装基准。
 
 ## 从图像建立可执行规格
 
@@ -67,7 +61,7 @@ y = designHeight / 2 - (rootTop + height / 2)
 - 字体资源、字号、行高、字距、对齐、Overflow、描边、阴影和字符串。
 - 激活状态、层级顺序以及是否受 Layout、Widget、Mask 或动画控制。
 
-当根节点锚点为 `(0.5, 0.5)`、节点锚点也为 `(0.5, 0.5)` 时，可把图像坐标换算为根节点本地坐标：
+先按上述统一缩放系数和留白偏移将原图测量值映射到设计画布。下面的 `left/top/width/height` 均为映射后的设计值，`canvasWidth/canvasHeight` 为工程设计分辨率；根与节点锚点均为 `(0.5, 0.5)` 时换算为根节点本地坐标：
 
 ```text
 x = left + width / 2 - canvasWidth / 2
